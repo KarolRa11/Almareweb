@@ -18,13 +18,19 @@ export async function middleware(request: NextRequest) {
           return request.cookies.getAll();
         },
         setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value }) =>
-            request.cookies.set(name, value),
-          );
-          response = NextResponse.next({ request });
-          cookiesToSet.forEach(({ name, value }) =>
-            response.cookies.set(name, value),
-          );
+          cookiesToSet.forEach(({ name, value, options }) => {
+            // Corrección TypeScript: Se pasa un solo objeto en lugar de 3 argumentos
+            request.cookies.set({ name, value, ...options });
+          });
+
+          response = NextResponse.next({
+            request,
+          });
+
+          cookiesToSet.forEach(({ name, value, options }) => {
+            // Corrección TypeScript: Se pasa un solo objeto
+            response.cookies.set({ name, value, ...options });
+          });
         },
       },
     },
@@ -33,16 +39,30 @@ export async function middleware(request: NextRequest) {
   const {
     data: { user },
   } = await supabase.auth.getUser();
+  const isAdminRoute = request.nextUrl.pathname.startsWith("/admin");
 
-  // Lógica de protección: Si intentas entrar a /admin y no estás logueado, ve al login
-  if (request.nextUrl.pathname.startsWith("/admin") && !user) {
-    return NextResponse.redirect(new URL("/login", request.url));
+  if (isAdminRoute) {
+    // Si no está autenticado va al login
+    if (!user) {
+      return NextResponse.redirect(new URL("/login", request.url));
+    }
+
+    // Validación segura de rol sin romper el flujo
+    const { data: perfil } = await supabase
+      .from("perfiles")
+      .select("rol")
+      .eq("id", user.id)
+      .maybeSingle();
+
+    // Si el rol no es válido, expulsión inmediata a la página pública
+    if (!perfil || perfil.rol !== "admin") {
+      return NextResponse.redirect(new URL("/", request.url));
+    }
   }
 
   return response;
 }
 
-// Configuración para que el middleware solo se ejecute en rutas relevantes
 export const config = {
   matcher: [
     "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
