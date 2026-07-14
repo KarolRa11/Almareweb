@@ -1,5 +1,10 @@
 @import "tailwindcss";
 
+/* Tailwind 4 usa la preferencia del sistema por defecto. Travel Almaré controla
+   el tema manualmente mediante la clase que administra next-themes. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+
 @theme {
   --color-alm-dark: #1d4f66;
   --color-alm-mid: #2b6b8a;
@@ -15,3 +20,13 @@ body {
   background-color: var(--color-alm-beige-light);
   color: var(--color-alm-dark);
 }
+
+html.dark body {
+  background-color: var(--color-alm-dark);
+  color: white;
+}
+
+html { scroll-behavior: smooth; }
+button, a, input, select, textarea { outline-offset: 3px; }
+button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 2px solid var(--color-alm-light); }
+button { cursor: pointer; }

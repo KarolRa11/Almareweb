@@ -6,7 +6,7 @@ import { IconPlaneDeparture, IconMail, IconLock } from "@tabler/icons-react";
 export default function Login() {
   // usamos useActionState para manejar la respuesta del servidor sin romper el HTML
   const [state, action, isPending] = useActionState(
-    async (prev: any, formData: FormData) => {
+    async (_prev: { error: string }, formData: FormData) => {
       return await loginAction(formData);
     },
     { error: "" },

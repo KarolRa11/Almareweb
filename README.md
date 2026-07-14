@@ -1,36 +1,78 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Travel Almaré
 
-## Getting Started
+Plataforma de catálogo y reservaciones para experiencias desde Acapulco, con autenticación de clientes y panel administrativo.
 
-First, run the development server:
+## Requisitos
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- Node.js 20 o superior.
+- Un proyecto de Supabase.
+- Variables en `.env.local`:
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=https://TU_PROYECTO.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=TU_CLAVE_ANON
+ADMIN_EMAILS=admin@almare.com
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+La clave `anon` es pública por diseño. Nunca agregue una `service_role` a una variable `NEXT_PUBLIC_*`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+`ADMIN_EMAILS` es una lista separada por comas usada como respaldo para cuentas administrativas creadas antes del trigger de perfiles. La autorización también acepta `perfiles.rol = 'admin'`.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Configurar Supabase
 
-## Learn More
+Para un proyecto nuevo, ejecute [`supabase/schema.sql`](supabase/schema.sql) en SQL Editor. El archivo crea tablas, relaciones, índices, validaciones, perfiles automáticos, RLS, Storage y la función transaccional de reservas.
 
-To learn more about Next.js, take a look at the following resources:
+La base histórica de este proyecto tiene `destinos.id bigint` y una columna incompatible `reservaciones.destino_id uuid`. Ejecute [`supabase/migrations/001_normalize_reservacion_destino.sql`](supabase/migrations/001_normalize_reservacion_destino.sql) para corregir esa instalación.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Para habilitar el panel editable de WhatsApp, Facebook, TikTok, Instagram y correo en una base ya existente, ejecute [`supabase/migrations/002_social_links.sql`](supabase/migrations/002_social_links.sql). Después podrá cambiar enlaces, visibilidad y orden desde **Dashboard → Contacto**.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Para publicar el logo, el degradado, el contenido de **Quiénes somos** y recibir solicitudes de llamada en todos los dispositivos, ejecute [`supabase/migrations/003_site_branding_and_contact.sql`](supabase/migrations/003_site_branding_and_contact.sql).
 
-## Deploy on Vercel
+Para activar perfiles completos, reglas por destino y cancelación desde **Mi cuenta**, ejecute [`supabase/migrations/004_agency_workflow.sql`](supabase/migrations/004_agency_workflow.sql).
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Para activar el CRM compartido —clientes, embudo, interacciones, tareas, cotizaciones, soporte, campañas, automatizaciones, analítica y permisos— ejecute [`supabase/migrations/005_professional_crm.sql`](supabase/migrations/005_professional_crm.sql). Mientras esta migración no esté publicada, el CRM usa almacenamiento local únicamente en el navegador actual.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Los colaboradores acceden en `/crm`. Ejemplo para asignar un vendedor:
+
+```sql
+update public.perfiles
+set crm_rol = 'vendedor'
+where id = 'UUID_DEL_COLABORADOR';
+```
+
+Roles disponibles: `administrador`, `gerente`, `vendedor`, `soporte`, `marketing`, `lector` y `cliente`. Las políticas RLS de la migración restringen lectura y escritura por área; no dependen solamente de ocultar botones en la interfaz.
+
+Para convertir al primer administrador, después de que se registre:
+
+```sql
+update public.perfiles set rol = 'admin' where id = 'UUID_DEL_USUARIO';
+```
+
+No permita que el formulario público asigne este rol.
+
+En Authentication → URL Configuration agregue las URL de desarrollo y producción, incluida `/restablecer-contrasena`, a las URL de redirección permitidas.
+
+Supabase aplica un límite reducido a los correos enviados por su proveedor integrado. Para registros reales en producción, configure un SMTP propio en Authentication → SMTP Settings. Durante desarrollo también puede desactivar temporalmente Confirm email en Authentication → Providers → Email; no lo desactive en producción sin evaluar el riesgo.
+
+## Desarrollo y validación
+
+```bash
+npm install
+npm run dev
+npm run lint
+npm run build
+```
+
+Abra [http://localhost:3000](http://localhost:3000). El dashboard administrativo vive en `/admin`; el espacio de trabajo para colaboradores vive en `/crm`. Ambos redirigen a `/login` cuando no existe una sesión autorizada.
+
+## Despliegue
+
+Configure las dos variables públicas en Vercel o el proveedor elegido y ejecute `npm run build`. Use HTTPS en producción y configure la URL pública en Supabase Auth.
+
+## Integraciones
+
+- Supabase Auth, PostgreSQL y Storage: implementados.
+- Google Maps: enlace público de exploración, sin clave privada.
+- Pagos: el esquema distingue estados, pero no se marca ningún pago como aprobado porque no hay una pasarela ni credenciales configuradas.
+- Correo: recuperación y confirmación usan los correos de Supabase Auth. No hay proveedor transaccional adicional configurado.
+- CRM: las automatizaciones internas de tareas están activas. Los envíos masivos o automáticos por correo y WhatsApp requieren configurar un proveedor externo antes de habilitar esas reglas.

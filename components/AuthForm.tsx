@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { createBrowserClient } from "@supabase/ssr";
 import { IconX } from "@tabler/icons-react";
+import { getAuthErrorMessage } from "@/lib/auth-errors";
 
 // EL TRUCO: Renombramos la propiedad a onCloseAction para que Next.js la acepte
 export default function AuthForm({
@@ -40,7 +41,7 @@ export default function AuthForm({
     }
 
     if (errorResult) {
-      setErrorMsg("Error: Verifica tus credenciales o intenta de nuevo.");
+      setErrorMsg(getAuthErrorMessage(errorResult.message));
       setLoading(false);
     } else {
       window.location.reload();

@@ -6,8 +6,8 @@ import { Providers } from "./providers";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Travel Almaré - Agencia de Viajes",
-  description: "Descubre tu próximo destino con nosotros.",
+  title: { default: "Travel Almaré | Experiencias en Acapulco", template: "%s | Travel Almaré" },
+  description: "Destinos exclusivos, paquetes a la medida y reservaciones en Acapulco, Guerrero.",
 };
 
 export default function RootLayout({
