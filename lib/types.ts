@@ -72,3 +72,63 @@ export type ContactRequest = {
   creado_en: string;
   estado: "nueva" | "contactada";
 };
+
+export type MarketplaceType = "hotel" | "airbnb" | "restaurante";
+export type MarketplacePriceUnit = "noche" | "persona" | "reservacion";
+export type MarketplaceReservationStatus =
+  | "pendiente"
+  | "confirmada"
+  | "cancelada"
+  | "completada";
+
+export type MarketplaceListing = {
+  id: string;
+  tipo: MarketplaceType;
+  nombre: string;
+  descripcion: string;
+  direccion: string;
+  latitud: number;
+  longitud: number;
+  precio: number;
+  descuento?: number | null;
+  unidad_precio: MarketplacePriceUnit;
+  imagen_principal?: string | null;
+  imagenes?: string[] | null;
+  amenidades?: string[] | null;
+  caracteristicas?: string[] | null;
+  capacidad_adultos: number;
+  capacidad_ninos: number;
+  capacidad_unidades: number;
+  minimo_noches: number;
+  hora_apertura?: string | null;
+  hora_cierre?: string | null;
+  dias_no_disponibles?: string[] | null;
+  activo: boolean;
+  destacado: boolean;
+  creado_en?: string;
+  actualizado_en?: string;
+};
+
+export type MarketplaceReservation = {
+  id: string;
+  folio: string;
+  usuario_id?: string | null;
+  establecimiento_id: string;
+  nombre_establecimiento: string;
+  tipo_establecimiento: MarketplaceType;
+  nombre_cliente: string;
+  email_cliente: string;
+  telefono: string;
+  fecha_inicio: string;
+  fecha_fin?: string | null;
+  hora?: string | null;
+  adultos: number;
+  ninos: number;
+  unidades: number;
+  notas?: string | null;
+  precio_unitario: number;
+  total_pagar: number;
+  estado: MarketplaceReservationStatus;
+  creado_en?: string;
+  actualizado_en?: string;
+};

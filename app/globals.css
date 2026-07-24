@@ -30,3 +30,49 @@ html { scroll-behavior: smooth; }
 button, a, input, select, textarea { outline-offset: 3px; }
 button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 2px solid var(--color-alm-light); }
 button { cursor: pointer; }
+
+.almare-map-marker-shell {
+  background: transparent;
+  border: 0;
+}
+
+.almare-map-marker {
+  display: grid;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  border: 3px solid white;
+  border-radius: 50% 50% 50% 12px;
+  background: var(--color-alm-teal);
+  box-shadow: 0 8px 18px rgb(29 79 102 / 35%);
+  font-size: 21px;
+  transform: rotate(-45deg);
+}
+
+.almare-map-marker--hotel { background: #2b6b8a; }
+.almare-map-marker--airbnb { background: #4a9b8e; }
+.almare-map-marker--restaurante { background: #d97706; }
+
+.almare-map-marker-shell .almare-map-marker {
+  line-height: 1;
+}
+
+.almare-map-marker-shell .almare-map-marker > * {
+  transform: rotate(45deg);
+}
+
+.leaflet-control-attribution {
+  font-size: 10px;
+}
+
+/* Leaflet usa capas internas con z-index altos. Este contexto aislado evita
+   que sus controles o marcadores atraviesen los diálogos de la aplicación. */
+.almare-marketplace-map {
+  position: relative;
+  isolation: isolate;
+  z-index: 0;
+}
+
+.almare-marketplace-map .leaflet-container {
+  z-index: 0;
+}

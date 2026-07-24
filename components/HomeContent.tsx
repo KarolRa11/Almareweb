@@ -11,11 +11,12 @@ import {
 } from "@tabler/icons-react";
 import CatalogoCliente from "@/components/CatalogoCliente";
 import ContactCallbackWidget from "@/components/ContactCallbackWidget";
+import MarketplaceExplorer from "@/components/MarketplaceExplorer";
 import Navbar from "@/components/Navbar";
 import { hexToRgba, readStoredSiteSettings, SITE_SETTINGS_STORAGE_KEY, SITE_SETTINGS_UPDATED_EVENT } from "@/lib/site-settings";
-import type { Banner, Destino, SiteSettings, SocialLink } from "@/lib/types";
+import type { Banner, Destino, MarketplaceListing, SiteSettings, SocialLink } from "@/lib/types";
 
-export default function HomeContent({ destinos, banners, socialLinks, initialSiteSettings }: { destinos: Destino[]; banners: Banner[]; socialLinks: SocialLink[]; initialSiteSettings: SiteSettings }) {
+export default function HomeContent({ destinos, banners, marketplaceListings, socialLinks, initialSiteSettings }: { destinos: Destino[]; banners: Banner[]; marketplaceListings: MarketplaceListing[]; socialLinks: SocialLink[]; initialSiteSettings: SiteSettings }) {
   const [query, setQuery] = useState("");
   const [fecha, setFecha] = useState("");
   const [viajeros, setViajeros] = useState("1");
@@ -98,28 +99,10 @@ export default function HomeContent({ destinos, banners, socialLinks, initialSit
             </div>
           </div>
           <CatalogoCliente destinos={resultados} fechaInicial={fecha} viajerosIniciales={Number(viajeros)} />
-          <section aria-labelledby="mapa-acapulco-titulo" className="mx-auto mt-10 w-full overflow-hidden rounded-2xl border border-alm-beige-mid bg-alm-beige shadow-lg dark:border-alm-mid dark:bg-[#133545]">
-            <div className="grid items-center justify-items-center gap-3 border-b border-alm-beige-mid px-4 py-4 text-center dark:border-alm-mid sm:grid-cols-[1fr_auto_1fr] sm:px-5">
-              <span className="hidden sm:block" aria-hidden />
-              <div className="sm:col-start-2">
-                <p className="text-[11px] font-bold uppercase tracking-[.2em] text-alm-teal">Ubicación</p>
-                <h3 id="mapa-acapulco-titulo" className="text-lg font-black text-alm-mid dark:text-white">Mapa interactivo de Acapulco</h3>
-              </div>
-              <a href="https://www.google.com/maps/search/?api=1&query=16.855186,-99.867323" target="_blank" rel="noreferrer" className="w-fit rounded-full border border-alm-beige-mid bg-white px-4 py-2 text-xs font-bold text-alm-mid transition hover:border-alm-teal hover:text-alm-teal dark:border-alm-mid dark:bg-alm-dark dark:text-white sm:col-start-3 sm:justify-self-end">
-                Abrir en Google Maps
-              </a>
-            </div>
-            <iframe
-              title="Mapa interactivo de Acapulco"
-              loading="lazy"
-              sandbox="allow-scripts allow-popups allow-popups-to-escape-sandbox"
-              referrerPolicy="strict-origin-when-cross-origin"
-              className="block h-[350px] w-full border-0 bg-white"
-              srcDoc={`<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#eef5f3}body>div{width:100%!important}@media(max-width:480px){html body .ol-zoom{transform:translate(8px,8px)!important}html body .map-mode-switcher{top:8px!important;right:8px!important}html body .map-mode-btn{padding:6px 9px!important;font-size:11px!important}html body .map-promo-badge{right:8px!important;bottom:8px!important;max-width:165px!important;border-width:2px!important;padding:6px 8px!important;font-size:9px!important;line-height:1.25!important}}</style></head><body><script src="https://mapas.sabro.net/map.php"><\/script><script>documen.writte(16.855186,-99.867323,350,12,0);<\/script></body></html>`}
-            />
-          </section>
         </div>
       </section>
+
+      <MarketplaceExplorer listings={marketplaceListings} />
 
       <section id="paquetes" className="scroll-mt-20 bg-alm-beige-light px-5 py-14 dark:bg-[#153f52]">
         <div className="mx-auto grid max-w-6xl gap-6 md:grid-cols-3">

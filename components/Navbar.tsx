@@ -24,6 +24,7 @@ import { QRCodeSVG } from "qrcode.react";
 import type { AuthChangeEvent, Session, User } from "@supabase/supabase-js";
 import { getSupabaseBrowserClient } from "@/lib/supabase-browser";
 import type {
+  MarketplaceReservation,
   Reservacion,
   SiteSettings,
   SocialLink,
@@ -67,6 +68,9 @@ export default function Navbar({
   const [loading, setLoading] = useState(false);
   const [recovering, setRecovering] = useState(false);
   const [reservas, setReservas] = useState<Reservacion[]>([]);
+  const [reservasMarketplace, setReservasMarketplace] = useState<
+    MarketplaceReservation[]
+  >([]);
   const [accountMessage, setAccountMessage] = useState("");
   const [qrLink, setQrLink] = useState<SocialLink | null>(null);
   const { resolvedTheme, setTheme } = useTheme();
@@ -97,6 +101,18 @@ export default function Navbar({
     document.documentElement.classList.toggle("light", !shouldUseDark);
     setTheme(shouldUseDark ? "dark" : "light");
   }
+
+  useEffect(() => {
+    const openAuthentication = () => {
+      setLogin(true);
+      setRecovering(false);
+      setError("");
+      setMessage("");
+      setAuthOpen(true);
+    };
+    window.addEventListener("almare:abrir-autenticacion", openAuthentication);
+    return () => window.removeEventListener("almare:abrir-autenticacion", openAuthentication);
+  }, []);
 
   useEffect(() => {
     async function syncUser(nextUser: User | null) {
@@ -143,12 +159,22 @@ export default function Navbar({
       window.location.href = "/admin";
       return;
     }
-    const { data } = await supabase
-      .from("reservaciones")
-      .select("*")
-      .eq("email_cliente", user.email)
-      .order("creado_en", { ascending: false });
-    setReservas((data ?? []) as Reservacion[]);
+    const [destinationResult, marketplaceResult] = await Promise.all([
+      supabase
+        .from("reservaciones")
+        .select("*")
+        .eq("email_cliente", user.email)
+        .order("creado_en", { ascending: false }),
+      supabase
+        .from("reservas_establecimientos")
+        .select("*")
+        .eq("usuario_id", user.id)
+        .order("creado_en", { ascending: false }),
+    ]);
+    setReservas((destinationResult.data ?? []) as Reservacion[]);
+    setReservasMarketplace(
+      (marketplaceResult.data ?? []) as MarketplaceReservation[],
+    );
     setAccountMessage("");
     setAccountOpen(true);
   }
@@ -267,16 +293,44 @@ export default function Navbar({
       );
     }
   }
+  async function cancelarReservaMarketplace(reserva: MarketplaceReservation) {
+    if (
+      !window.confirm(
+        `¿Deseas cancelar la reservación de ${reserva.nombre_establecimiento}?`,
+      )
+    )
+      return;
+    setAccountMessage("");
+    const { error: cancelError } = await supabase
+      .from("reservas_establecimientos")
+      .update({ estado: "cancelada" })
+      .eq("id", reserva.id)
+      .eq("usuario_id", user?.id);
+    if (cancelError)
+      setAccountMessage(
+        "No fue posible cancelar la reservación. Comunícate con Travel Almaré indicando tu folio.",
+      );
+    else {
+      setReservasMarketplace((current) =>
+        current.map((item) =>
+          item.id === reserva.id ? { ...item, estado: "cancelada" } : item,
+        ),
+      );
+      setAccountMessage(
+        "Tu reservación fue cancelada. El equipo recibió la actualización.",
+      );
+    }
+  }
   const link =
-    "text-sm font-semibold text-alm-mid transition hover:text-alm-teal dark:text-alm-beige-light";
+    "whitespace-nowrap text-sm font-semibold text-alm-mid transition hover:text-alm-teal dark:text-alm-beige-light";
 
   return (
     <>
       <nav className="sticky top-0 z-40 border-b border-alm-beige-mid bg-white/95 px-5 py-3 backdrop-blur dark:border-alm-mid dark:bg-[#102f3e]/95">
-        <div className="relative mx-auto flex w-full max-w-6xl items-center justify-between">
+        <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-4">
           <a
             href="#inicio"
-            className="flex items-center gap-2"
+            className="flex shrink-0 items-center gap-2"
             aria-label="Travel Almaré, inicio"
           >
             {siteSettings.logoUrl ? (
@@ -298,19 +352,22 @@ export default function Navbar({
               </b>
             </span>
           </a>
-          <button
-            type="button"
-            onClick={() => setAboutOpen(true)}
-            className="absolute left-1/2 hidden -translate-x-1/2 rounded-lg px-2 py-2 text-sm font-bold text-alm-mid transition hover:bg-alm-beige-light hover:text-alm-teal lg:block dark:text-alm-beige-light dark:hover:bg-alm-mid/30"
-          >
-            {siteSettings.aboutTitle}
-          </button>
-          <div className="hidden items-center gap-3 md:flex">
+          <div className="hidden items-center gap-4 lg:flex">
+            <button
+              type="button"
+              onClick={() => setAboutOpen(true)}
+              className={`${link} rounded-lg px-2 py-2 font-bold hover:bg-alm-beige-light dark:hover:bg-alm-mid/30`}
+            >
+              {siteSettings.aboutTitle}
+            </button>
             <a href="#inicio" className={link}>
               Inicio
             </a>
             <a href="#destinos" className={link}>
               Destinos
+            </a>
+            <a href="#estancias" className={link}>
+              Hospedaje
             </a>
             <a href="#paquetes" className={link}>
               Paquetes
@@ -350,17 +407,18 @@ export default function Navbar({
           </div>
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
-            className="rounded-lg p-2 text-alm-mid md:hidden dark:text-white"
+            className="rounded-lg p-2 text-alm-mid lg:hidden dark:text-white"
             aria-label="Abrir menú"
           >
             {mobileOpen ? <IconX /> : <IconMenu2 />}
           </button>
         </div>
         {mobileOpen && (
-          <div className="mx-auto mt-3 grid w-full max-w-6xl gap-2 border-t border-alm-beige-mid pt-3 md:hidden dark:border-alm-mid">
+          <div className="mx-auto mt-3 grid w-full max-w-7xl gap-2 border-t border-alm-beige-mid pt-3 lg:hidden dark:border-alm-mid">
             {[
               ["Inicio", "#inicio"],
               ["Destinos", "#destinos"],
+              ["Hospedaje", "#estancias"],
               ["Paquetes", "#paquetes"],
             ].map(([label, href]) => (
               <a
@@ -837,7 +895,7 @@ export default function Navbar({
               </p>
             )}
             <h3 className="mb-3 mt-7 font-black">Mis reservaciones</h3>
-            {reservas.length === 0 ? (
+            {reservas.length === 0 && reservasMarketplace.length === 0 ? (
               <p className="rounded-xl bg-alm-beige-light p-5 text-sm text-gray-500 dark:bg-alm-dark dark:text-alm-beige-mid">
                 Aún no tienes reservaciones.
               </p>
@@ -895,6 +953,55 @@ export default function Navbar({
                           </button>
                         )}
                       </div>
+                    </article>
+                  );
+                })}
+                {reservasMarketplace.map((r) => {
+                  const canCancel =
+                    r.estado === "pendiente" || r.estado === "confirmada";
+                  const dateText =
+                    r.tipo_establecimiento === "restaurante"
+                      ? `${new Date(`${r.fecha_inicio}T12:00:00`).toLocaleDateString("es-MX", { dateStyle: "long" })}${r.hora ? ` · ${r.hora.slice(0, 5)} h` : ""}`
+                      : `${new Date(`${r.fecha_inicio}T12:00:00`).toLocaleDateString("es-MX", { dateStyle: "medium" })}${r.fecha_fin ? ` – ${new Date(`${r.fecha_fin}T12:00:00`).toLocaleDateString("es-MX", { dateStyle: "medium" })}` : ""}`;
+                  return (
+                    <article
+                      key={r.id}
+                      className="rounded-xl border border-alm-beige-mid p-4 dark:border-alm-mid"
+                    >
+                      <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-start">
+                        <div>
+                          <div className="flex flex-wrap items-center gap-2">
+                            <h4 className="font-black">
+                              {r.nombre_establecimiento}
+                            </h4>
+                            <span className="rounded-full bg-alm-teal/10 px-2 py-0.5 text-[10px] font-black uppercase text-alm-mid dark:text-alm-pastel">
+                              {r.tipo_establecimiento}
+                            </span>
+                            <span
+                              className={`rounded-full px-2 py-0.5 text-[10px] font-black uppercase ${r.estado === "cancelada" ? "bg-red-100 text-red-600" : r.estado === "completada" ? "bg-blue-100 text-blue-700" : r.estado === "confirmada" ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700"}`}
+                            >
+                              {r.estado}
+                            </span>
+                          </div>
+                          <p className="mt-1 text-xs text-gray-500 dark:text-alm-beige-mid">
+                            Folio: {r.folio}
+                          </p>
+                          <p className="text-xs text-gray-500 dark:text-alm-beige-mid">
+                            {dateText} · {r.adultos + r.ninos} persona(s)
+                          </p>
+                        </div>
+                        <strong className="text-alm-teal">
+                          ${Number(r.total_pagar).toLocaleString("es-MX")} MXN
+                        </strong>
+                      </div>
+                      {canCancel && (
+                        <button
+                          onClick={() => cancelarReservaMarketplace(r)}
+                          className="mt-3 rounded-lg border border-red-300 px-3 py-2 text-xs font-bold text-red-600 hover:bg-red-50"
+                        >
+                          Cancelar reservación
+                        </button>
+                      )}
                     </article>
                   );
                 })}

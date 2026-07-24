@@ -2,7 +2,7 @@ import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import HomeContent from "@/components/HomeContent";
-import type { Banner, Destino } from "@/lib/types";
+import type { Banner, Destino, MarketplaceListing } from "@/lib/types";
 import { isAdminIdentity, isCrmStaff } from "@/lib/admin-auth";
 import { parseSocialLinks } from "@/lib/social-links";
 import { parseSiteSettings } from "@/lib/site-settings";
@@ -25,13 +25,19 @@ export default async function Home() {
     if (isAdminIdentity(user.email, perfil?.rol)) redirect("/admin");
     if (isCrmStaff(perfil?.crm_rol)) redirect("/crm");
   }
-  const [{ data, error }, { data: banners }, { data: contactConfig }, { data: siteConfig }] = await Promise.all([
+  const [{ data, error }, { data: banners }, { data: contactConfig }, { data: siteConfig }, marketplaceResult] = await Promise.all([
     supabase.from("destinos").select("*").order("precio", { ascending: true }),
     supabase.from("banners").select("*").order("creado_en", { ascending: false }),
     supabase.from("configuracion").select("valor").eq("clave", "redes_sociales").maybeSingle(),
     supabase.from("configuracion").select("valor").eq("clave", "apariencia_sitio").maybeSingle(),
+    supabase.from("establecimientos").select("*").eq("activo", true).order("destacado", { ascending: false }).order("nombre"),
   ]);
 
   if (error) console.error("No fue posible cargar destinos:", error.message);
-  return <><PageAnalytics /><HomeContent destinos={(data ?? []) as Destino[]} banners={(banners ?? []) as Banner[]} socialLinks={parseSocialLinks(contactConfig?.valor)} initialSiteSettings={parseSiteSettings(siteConfig?.valor)} /></>;
+  if (
+    marketplaceResult.error &&
+    !["42P01", "PGRST205"].includes(marketplaceResult.error.code ?? "")
+  )
+    console.error("No fue posible cargar establecimientos:", marketplaceResult.error.message);
+  return <><PageAnalytics /><HomeContent destinos={(data ?? []) as Destino[]} banners={(banners ?? []) as Banner[]} marketplaceListings={(marketplaceResult.data ?? []) as MarketplaceListing[]} socialLinks={parseSocialLinks(contactConfig?.valor)} initialSiteSettings={parseSiteSettings(siteConfig?.valor)} /></>;
 }

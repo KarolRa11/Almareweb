@@ -460,13 +460,9 @@ export default function CrmManager({
       action === "insert"
         ? await supabase.from(table).insert(row)
         : await supabase.from(table).update(row).eq("id", row.id);
-    if (
-      result.error &&
-      !result.error.message.includes("schema cache") &&
-      !result.error.message.includes("does not exist")
-    )
+    if (result.error)
       setNotice(`No se pudo guardar en la nube: ${result.error.message}`);
-    else if (!result.error) setNotice("Cambios guardados correctamente.");
+    else setNotice("Cambios guardados correctamente.");
     return !result.error;
   }
   async function ensureContact(id: string): Promise<string> {
@@ -673,12 +669,12 @@ export default function CrmManager({
         ? 0
         : STAGES.find((s) => s.id === etapa)?.probability || item.probabilidad;
     const next = { ...item, etapa, probabilidad, actualizado_en: now() };
-    setOportunidades((all) => all.map((o) => (o.id === item.id ? next : o)));
-    await persist(
+    const saved = await persist(
       "crm_oportunidades",
       next as unknown as Record<string, unknown>,
       "update",
     );
+    if (saved) setOportunidades((all) => all.map((o) => (o.id === item.id ? next : o)));
   }
   async function completeTask(item: CrmTask) {
     if (!canWrite) { setNotice("No tienes permiso para modificar tareas."); return; }
@@ -689,60 +685,62 @@ export default function CrmManager({
           ? ("pendiente" as const)
           : ("completada" as const),
     };
-    setTareas((all) => all.map((t) => (t.id === item.id ? next : t)));
-    await persist(
+    const saved = await persist(
       "crm_tareas",
       next as unknown as Record<string, unknown>,
       "update",
     );
+    if (saved) setTareas((all) => all.map((t) => (t.id === item.id ? next : t)));
   }
   async function updateQuote(item: CrmQuote, estado: CrmQuote["estado"]) {
     if (!canWrite) { setNotice("No tienes permiso para modificar cotizaciones."); return; }
     const next = { ...item, estado };
-    setCotizaciones((all) => all.map((q) => (q.id === item.id ? next : q)));
-    await persist(
+    const saved = await persist(
       "crm_cotizaciones",
       next as unknown as Record<string, unknown>,
       "update",
     );
+    if (saved) setCotizaciones((all) => all.map((q) => (q.id === item.id ? next : q)));
   }
   async function updateTicket(item: CrmTicket, estado: CrmTicket["estado"]) {
     if (!canWrite) { setNotice("No tienes permiso para modificar tickets."); return; }
     const next = { ...item, estado };
-    setTickets((all) => all.map((t) => (t.id === item.id ? next : t)));
-    await persist(
+    const saved = await persist(
       "crm_tickets",
       next as unknown as Record<string, unknown>,
       "update",
     );
+    if (saved) setTickets((all) => all.map((t) => (t.id === item.id ? next : t)));
   }
   async function toggleAutomation(item: CrmAutomation) {
     if (!canWrite) { setNotice("No tienes permiso para modificar automatizaciones."); return; }
     const next = { ...item, activa: !item.activa };
-    setAutomatizaciones((all) => all.map((a) => (a.id === item.id ? next : a)));
-    if (!item.id.startsWith("auto-"))
-      await persist(
+    if (!item.id.startsWith("auto-")) {
+      const saved = await persist(
         "crm_automatizaciones",
         next as unknown as Record<string, unknown>,
         "update",
       );
+      if (!saved) return;
+    }
+    setAutomatizaciones((all) => all.map((a) => (a.id === item.id ? next : a)));
   }
   async function updateTeamRole(
     profile: Perfil,
     crm_rol: NonNullable<Perfil["crm_rol"]>,
   ) {
-    setEquipo((all) =>
-      all.map((p) => (p.id === profile.id ? { ...p, crm_rol } : p)),
-    );
     const { error } = await supabase
       .from("perfiles")
       .update({ crm_rol })
       .eq("id", profile.id);
-    setNotice(
-      error
-        ? "El rol quedó guardado localmente. Ejecuta la migración CRM para persistirlo."
-        : "Permisos del colaborador actualizados.",
+    if (error) {
+      setNotice(`No se pudieron actualizar los permisos: ${error.message}`);
+      return;
+    }
+    setEquipo((all) =>
+      all.map((p) => (p.id === profile.id ? { ...p, crm_rol } : p)),
     );
+    setNotice("Permisos del colaborador actualizados.");
   }
   function downloadQuote(item: CrmQuote) {
     const text = [
@@ -769,9 +767,14 @@ export default function CrmManager({
   async function removeContact(item: CrmContact) {
     if (!canWrite) { setNotice("No tienes permiso para eliminar contactos."); return; }
     if (!confirm(`¿Eliminar a ${item.nombre} del CRM?`)) return;
+    if (!item.derived) {
+      const { error } = await supabase.from("crm_contactos").delete().eq("id", item.id);
+      if (error) {
+        setNotice(`No se pudo eliminar el contacto: ${error.message}`);
+        return;
+      }
+    }
     setContactos((all) => all.filter((c) => c.id !== item.id));
-    if (!item.derived)
-      await supabase.from("crm_contactos").delete().eq("id", item.id);
     setSelectedContact(null);
   }
 

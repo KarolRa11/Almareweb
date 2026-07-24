@@ -32,6 +32,8 @@ Para activar perfiles completos, reglas por destino y cancelación desde **Mi cu
 
 Para activar el CRM compartido —clientes, embudo, interacciones, tareas, cotizaciones, soporte, campañas, automatizaciones, analítica y permisos— ejecute [`supabase/migrations/005_professional_crm.sql`](supabase/migrations/005_professional_crm.sql). Mientras esta migración no esté publicada, el CRM usa almacenamiento local únicamente en el navegador actual.
 
+Para activar el catálogo profesional de **hoteles, Airbnb y restaurantes**, el mapa con marcadores filtrables, disponibilidad y reservaciones, ejecute [`supabase/migrations/006_marketplace_hospitality.sql`](supabase/migrations/006_marketplace_hospitality.sql) después de la migración 005. El módulo se administra desde **Dashboard → Hospedaje y restaurantes**. La función SQL incluida calcula el precio, valida capacidad, fechas bloqueadas, horarios y evita sobreventa antes de registrar cada solicitud.
+
 Los colaboradores acceden en `/crm`. Ejemplo para asignar un vendedor:
 
 ```sql
@@ -73,6 +75,7 @@ Configure las dos variables públicas en Vercel o el proveedor elegido y ejecute
 
 - Supabase Auth, PostgreSQL y Storage: implementados.
 - Google Maps: enlace público de exploración, sin clave privada.
+- Mapas del marketplace: OpenStreetMap y Leaflet, sin clave privada; los puntos y sus filtros se alimentan de `establecimientos`.
 - Pagos: el esquema distingue estados, pero no se marca ningún pago como aprobado porque no hay una pasarela ni credenciales configuradas.
 - Correo: recuperación y confirmación usan los correos de Supabase Auth. No hay proveedor transaccional adicional configurado.
 - CRM: las automatizaciones internas de tareas están activas. Los envíos masivos o automáticos por correo y WhatsApp requieren configurar un proveedor externo antes de habilitar esas reglas.
