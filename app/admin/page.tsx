@@ -6,7 +6,9 @@ import SocialLinksManager from "@/components/admin/SocialLinksManager";
 import SiteSettingsManager from "@/components/admin/SiteSettingsManager";
 import CrmManager from "@/components/admin/CrmManager";
 import MarketplaceManager from "@/components/admin/MarketplaceManager";
-import type { Banner, Destino, Perfil, Reservacion } from "@/lib/types";
+import PaymentSettingsManager from "@/components/admin/PaymentSettingsManager";
+import type { Banner, Destino, PaymentStatus, Perfil, Reservacion } from "@/lib/types";
+import { normalizePaymentStatus, PAYMENT_STATUS_LABEL } from "@/lib/payment-settings";
 import { destinationPolicy, mergeStoredDestinationRules, storeDestinationRules } from "@/lib/destination-rules";
 import Image from "next/image";
 import {
@@ -102,6 +104,31 @@ export default function AdminDashboard() {
     }
   }
 
+  async function actualizarEstadoPagoReserva(
+    reserva: Reservacion,
+    estadoPago: PaymentStatus,
+  ) {
+    const { error } = await supabase
+      .from("reservaciones")
+      .update({ estado_pago: estadoPago })
+      .eq("id", reserva.id);
+    if (error) {
+      setNotice({
+        type: "error",
+        text: `No se pudo actualizar el pago: ${error.message}`,
+      });
+      return;
+    }
+    setNotice({
+      type: "ok",
+      text: `Pago marcado como ${PAYMENT_STATUS_LABEL[estadoPago].toLocaleLowerCase("es")}.`,
+    });
+    setReservaSeleccionada((current) =>
+      current ? { ...current, estado_pago: estadoPago } : current,
+    );
+    await cargarDatos();
+  }
+
   async function eliminarReserva(reserva: Reservacion) {
     if (!window.confirm(`¿Eliminar definitivamente la reservación ${reserva.folio || reserva.id}? Esta acción no se puede deshacer.`)) return;
     const { error } = await supabase.from("reservaciones").delete().eq("id", reserva.id);
@@ -115,8 +142,8 @@ export default function AdminDashboard() {
 
   function exportarReservas() {
     const escape = (value: unknown) => `"${String(value ?? "").replaceAll('"', '""')}"`;
-    const rows = reservasVisibles.map((r) => [r.folio || r.id, r.nombre_cliente, r.email_cliente, r.telefono, r.titulo_destino, r.fecha_viaje, r.pasajeros, r.total_pagar, r.estado || "registrada"]);
-    const csv = [["Folio", "Cliente", "Correo", "Teléfono", "Destino", "Fecha", "Pasajeros", "Total MXN", "Estado"], ...rows].map((row) => row.map(escape).join(",")).join("\n");
+    const rows = reservasVisibles.map((r) => [r.folio || r.id, r.nombre_cliente, r.email_cliente, r.telefono, r.titulo_destino, r.fecha_viaje, r.pasajeros, r.total_pagar, PAYMENT_STATUS_LABEL[normalizePaymentStatus(r.estado_pago)], r.estado || "registrada"]);
+    const csv = [["Folio", "Cliente", "Correo", "Teléfono", "Destino", "Fecha", "Pasajeros", "Total MXN", "Pago", "Estado"], ...rows].map((row) => row.map(escape).join(",")).join("\n");
     const url = URL.createObjectURL(new Blob([`\uFEFF${csv}`], { type: "text/csv;charset=utf-8" }));
     const anchor = document.createElement("a"); anchor.href = url; anchor.download = `reservaciones-almare-${new Date().toISOString().slice(0, 10)}.csv`; anchor.click(); URL.revokeObjectURL(url);
   }
@@ -348,6 +375,17 @@ export default function AdminDashboard() {
                   <div className="grid grid-cols-2 gap-3"><div><dt className="text-xs font-bold uppercase text-gray-400">Fecha de viaje</dt><dd>{new Date(`${reservaSeleccionada.fecha_viaje}T12:00:00`).toLocaleDateString("es-MX", { dateStyle: "long" })}</dd></div><div><dt className="text-xs font-bold uppercase text-gray-400">Pasajeros</dt><dd>{reservaSeleccionada.pasajeros}</dd></div></div>
                   <div><dt className="text-xs font-bold uppercase text-gray-400">Total</dt><dd className="text-xl font-black text-alm-teal">${Number(reservaSeleccionada.total_pagar).toLocaleString("es-MX")} MXN</dd></div>
                   <div><dt className="text-xs font-bold uppercase text-gray-400">Estado</dt><dd><span className={`mt-1 inline-block rounded-full px-3 py-1 text-xs font-black uppercase ${reservaSeleccionada.estado === "cancelada" ? "bg-red-100 text-red-600" : reservaSeleccionada.estado === "confirmada" ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700"}`}>{reservaSeleccionada.estado || "pendiente"}</span></dd></div>
+                  <label className="block text-xs font-bold uppercase text-gray-400">Estado del pago
+                    <select
+                      value={normalizePaymentStatus(reservaSeleccionada.estado_pago)}
+                      onChange={(event) => void actualizarEstadoPagoReserva(reservaSeleccionada, event.target.value as PaymentStatus)}
+                      className="mt-1 block w-full rounded-xl border bg-white px-3 py-2 text-sm font-bold normal-case text-alm-dark"
+                    >
+                      <option value="pagar">Pagar</option>
+                      <option value="pendiente">Pendiente</option>
+                      <option value="pagado">Pagado</option>
+                    </select>
+                  </label>
                 </dl>
               </div>
             </div>
@@ -730,6 +768,8 @@ export default function AdminDashboard() {
             </div>
           </div>
 
+          <PaymentSettingsManager />
+
           {/* NUEVA SECCIÓN: GESTIÓN DE RESERVACIONES */}
           <div id="reservaciones" className="scroll-mt-24 bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
             <div className="px-4 md:px-6 py-5 border-b bg-gray-50 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
@@ -757,6 +797,7 @@ export default function AdminDashboard() {
                     <th className="px-6 py-4 font-bold text-right">
                       Total (MXN)
                     </th>
+                    <th className="px-6 py-4 font-bold">Pago</th>
                     <th className="px-6 py-4 font-bold">Estado</th>
                     <th className="px-6 py-4 font-bold text-right">Acciones</th>
                   </tr>
@@ -765,7 +806,7 @@ export default function AdminDashboard() {
                   {reservasVisibles.length === 0 && (
                     <tr>
                       <td
-                        colSpan={7}
+                        colSpan={8}
                         className="px-6 py-8 text-center text-gray-400"
                       >
                         {reservaciones.length === 0 ? "Aún no hay reservaciones registradas." : "No hay resultados para estos filtros."}
@@ -794,6 +835,25 @@ export default function AdminDashboard() {
                       </td>
                       <td className="px-6 py-4 text-right font-black text-alm-teal">
                         ${Number(res.total_pagar).toLocaleString()}
+                      </td>
+                      <td className="px-6 py-4">
+                        <select
+                          value={normalizePaymentStatus(res.estado_pago)}
+                          onClick={(event) => event.stopPropagation()}
+                          onChange={(event) => {
+                            event.stopPropagation();
+                            void actualizarEstadoPagoReserva(
+                              res,
+                              event.target.value as PaymentStatus,
+                            );
+                          }}
+                          aria-label={`Estado de pago de ${res.nombre_cliente}`}
+                          className="rounded-lg border px-2 py-2 text-xs font-bold"
+                        >
+                          <option value="pagar">Pagar</option>
+                          <option value="pendiente">Pendiente</option>
+                          <option value="pagado">Pagado</option>
+                        </select>
                       </td>
                       <td className="px-6 py-4"><span className={`rounded-full px-2.5 py-1 text-[10px] font-black uppercase ${res.estado === "cancelada" ? "bg-red-100 text-red-600" : res.estado === "confirmada" ? "bg-emerald-100 text-emerald-700" : res.estado === "completada" ? "bg-blue-100 text-blue-700" : "bg-amber-100 text-amber-700"}`}>{res.estado || "pendiente"}</span></td>
                       <td className="px-6 py-4 text-right"><button type="button" onClick={(event) => { event.stopPropagation(); setReservaSeleccionada(res); }} className="rounded-lg border border-alm-mid px-3 py-2 text-xs font-bold text-alm-mid">Ver ficha</button></td>

@@ -113,7 +113,6 @@ export default function MarketplaceExplorer({
   const [mapFilter, setMapFilter] = useState<"todos" | MarketplaceType>(
     "todos",
   );
-  const [mapOpen, setMapOpen] = useState(false);
   const [selected, setSelected] = useState<MarketplaceListing | null>(null);
   const [booking, setBooking] = useState(false);
   const [imageIndex, setImageIndex] = useState(0);
@@ -164,7 +163,6 @@ export default function MarketplaceExplorer({
   );
 
   const selectListing = useCallback((listing: MarketplaceListing) => {
-    setMapOpen(false);
     setSelected(listing);
     setBooking(false);
     setImageIndex(0);
@@ -320,7 +318,7 @@ export default function MarketplaceExplorer({
               </p>
             </div>
           ) : (
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <div className="grid items-stretch gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {cardListings.map((listing) => {
                 const price =
                   Number(listing.precio) *
@@ -328,18 +326,18 @@ export default function MarketplaceExplorer({
                 return (
                   <article
                     key={listing.id}
-                    className="overflow-hidden rounded-2xl border border-alm-beige-mid bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-xl dark:border-alm-mid dark:bg-alm-dark"
+                    className="flex h-full min-w-0 flex-col overflow-hidden rounded-2xl border border-alm-beige-mid bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-xl dark:border-alm-mid dark:bg-alm-dark"
                   >
                     <button
                       type="button"
                       onClick={() => selectListing(listing)}
-                      className="relative block h-52 w-full overflow-hidden text-left"
+                      className="relative block h-48 w-full shrink-0 overflow-hidden text-left sm:h-52 lg:h-56"
                       aria-label={`Ver detalles de ${listing.nombre}`}
                     >
                       <Image
                         unoptimized
                         fill
-                        sizes="(max-width: 768px) 100vw, 33vw"
+                        sizes="(max-width: 639px) 100vw, (max-width: 1023px) 50vw, 33vw"
                         src={listing.imagen_principal || fallback}
                         alt={listing.nombre}
                         className="object-cover transition duration-500 hover:scale-105"
@@ -349,13 +347,15 @@ export default function MarketplaceExplorer({
                         {typeLabel[listing.tipo].slice(0, -1)}
                       </span>
                     </button>
-                    <div className="p-5">
-                      <h3 className="text-xl font-black">{listing.nombre}</h3>
+                    <div className="flex flex-1 flex-col p-4 sm:p-5">
+                      <h3 className="break-words text-xl font-black">
+                        {listing.nombre}
+                      </h3>
                       <p className="mt-1 flex items-start gap-1 text-xs text-gray-500 dark:text-alm-beige-mid">
                         <IconMapPin size={15} className="shrink-0" />
                         {listing.direccion}
                       </p>
-                      <div className="mt-4 flex flex-wrap gap-1.5">
+                      <div className="mt-4 flex min-h-7 flex-wrap content-start gap-1.5">
                         {(listing.amenidades ?? []).slice(0, 3).map((amenity) => (
                           <span
                             key={amenity}
@@ -365,8 +365,8 @@ export default function MarketplaceExplorer({
                           </span>
                         ))}
                       </div>
-                      <div className="mt-5 flex items-end justify-between gap-4 border-t border-alm-beige-mid pt-4 dark:border-alm-mid">
-                        <div>
+                      <div className="mt-auto flex flex-col gap-4 border-t border-alm-beige-mid pt-4 dark:border-alm-mid sm:flex-row sm:items-end sm:justify-between">
+                        <div className="min-w-0">
                           {Number(listing.descuento) > 0 && (
                             <p className="text-xs font-bold text-red-500 line-through">
                               {money.format(Number(listing.precio))}
@@ -388,7 +388,7 @@ export default function MarketplaceExplorer({
                         <button
                           type="button"
                           onClick={() => selectListing(listing)}
-                          className="rounded-xl bg-alm-teal px-4 py-2.5 text-xs font-black text-white hover:bg-alm-mid"
+                          className="w-full shrink-0 whitespace-nowrap rounded-xl bg-alm-teal px-4 py-2.5 text-xs font-black text-white hover:bg-alm-mid sm:w-auto"
                         >
                           Ver detalles
                         </button>
@@ -404,7 +404,7 @@ export default function MarketplaceExplorer({
             aria-labelledby="mapa-marketplace-title"
             className="mt-12 overflow-hidden rounded-2xl border border-alm-beige-mid bg-white shadow-lg dark:border-alm-mid dark:bg-alm-dark"
           >
-            <div className="flex flex-col gap-4 bg-alm-beige p-5 dark:bg-[#133545] md:flex-row md:items-center md:justify-between">
+            <div className="bg-alm-beige p-5 dark:bg-[#133545]">
               <div>
                 <p className="text-[10px] font-black uppercase tracking-[.2em] text-alm-teal">
                   Ubicación
@@ -419,65 +419,45 @@ export default function MarketplaceExplorer({
                   Selecciona un punto para consultar detalles y reservar.
                 </p>
               </div>
-              <button
-                type="button"
-                onClick={() => setMapOpen((open) => !open)}
-                aria-expanded={mapOpen}
-                aria-controls="marketplace-map-panel"
-                className="inline-flex w-fit items-center justify-center gap-2 rounded-xl bg-alm-teal px-5 py-3 text-xs font-black text-white shadow-md transition hover:bg-alm-mid"
-              >
-                <IconMapPin size={18} aria-hidden />
-                {mapOpen ? "Cerrar mapa" : "Abrir mapa"}
-              </button>
             </div>
-            {mapOpen && (
+            <div
+              id="marketplace-map-panel"
+              className="almare-marketplace-map border-t border-alm-beige-mid dark:border-alm-mid"
+            >
               <div
-                id="marketplace-map-panel"
-                className="almare-marketplace-map border-t border-alm-beige-mid dark:border-alm-mid"
+                className="flex flex-wrap gap-2 bg-white px-5 py-3 dark:bg-alm-dark"
+                role="group"
+                aria-label="Filtrar puntos del mapa"
               >
-                <div
-                  className="flex flex-wrap gap-2 bg-white px-5 py-3 dark:bg-alm-dark"
-                  role="group"
-                  aria-label="Filtrar puntos del mapa"
-                >
-                  {filterButtons.map(([value, label]) => (
-                    <button
-                      key={value}
-                      type="button"
-                      onClick={() => setMapFilter(value)}
-                      aria-pressed={mapFilter === value}
-                      className={`rounded-full px-3 py-2 text-[11px] font-bold ${
-                        mapFilter === value
-                          ? "bg-alm-teal text-white"
-                          : "border border-alm-beige-mid bg-white text-alm-mid dark:bg-alm-dark dark:text-white"
-                      }`}
-                    >
-                      {label}
-                    </button>
-                  ))}
-                </div>
-                <div className="relative">
+                {filterButtons.map(([value, label]) => (
                   <button
+                    key={value}
                     type="button"
-                    onClick={() => setMapOpen(false)}
-                    aria-label="Cerrar mapa"
-                    className="absolute right-4 top-4 z-[1000] grid size-11 place-items-center rounded-full border border-alm-beige-mid bg-white text-alm-mid shadow-lg transition hover:bg-alm-beige-light"
+                    onClick={() => setMapFilter(value)}
+                    aria-pressed={mapFilter === value}
+                    className={`rounded-full px-3 py-2 text-[11px] font-bold ${
+                      mapFilter === value
+                        ? "bg-alm-teal text-white"
+                        : "border border-alm-beige-mid bg-white text-alm-mid dark:bg-alm-dark dark:text-white"
+                    }`}
                   >
-                    <IconX size={22} aria-hidden />
+                    {label}
                   </button>
-                  {mapListings.length ? (
-                    <MarketplaceMap
-                      listings={mapListings}
-                      onSelect={selectListing}
-                    />
-                  ) : (
-                    <div className="grid h-72 place-items-center text-center text-sm text-gray-500">
-                      No hay puntos publicados en esta categoría.
-                    </div>
-                  )}
-                </div>
+                ))}
               </div>
-            )}
+              <div className="relative">
+                {mapListings.length ? (
+                  <MarketplaceMap
+                    listings={mapListings}
+                    onSelect={selectListing}
+                  />
+                ) : (
+                  <div className="grid h-72 place-items-center text-center text-sm text-gray-500">
+                    No hay puntos publicados en esta categoría.
+                  </div>
+                )}
+              </div>
+            </div>
           </section>
         </div>
       </section>

@@ -27,6 +27,13 @@ export type Reservacion = {
   creado_en?: string;
   folio?: string;
   estado?: "pendiente" | "confirmada" | "cancelada" | "completada";
+  estado_pago?: PaymentStatus;
+};
+
+export type PaymentStatus = "pagar" | "pendiente" | "pagado";
+
+export type PaymentSettings = {
+  message: string;
 };
 
 export type Perfil = {
@@ -129,6 +136,7 @@ export type MarketplaceReservation = {
   precio_unitario: number;
   total_pagar: number;
   estado: MarketplaceReservationStatus;
+  estado_pago?: PaymentStatus;
   creado_en?: string;
   actualizado_en?: string;
 };

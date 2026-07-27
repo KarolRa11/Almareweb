@@ -9,6 +9,7 @@ import {
   IconBrandTiktok,
   IconBrandWhatsapp,
   IconCalendarPlus,
+  IconCreditCard,
   IconExternalLink,
   IconLogout,
   IconMail,
@@ -25,6 +26,7 @@ import type { AuthChangeEvent, Session, User } from "@supabase/supabase-js";
 import { getSupabaseBrowserClient } from "@/lib/supabase-browser";
 import type {
   MarketplaceReservation,
+  PaymentStatus,
   Reservacion,
   SiteSettings,
   SocialLink,
@@ -38,6 +40,12 @@ import {
   SOCIAL_LINKS_UPDATED_EVENT,
 } from "@/lib/social-links";
 import { isCrmStaff } from "@/lib/admin-auth";
+import {
+  DEFAULT_PAYMENT_SETTINGS,
+  normalizePaymentStatus,
+  parsePaymentSettings,
+  PAYMENT_STATUS_LABEL,
+} from "@/lib/payment-settings";
 
 function ContactIcon({ id }: { id: SocialNetwork }) {
   if (id === "whatsapp") return <IconBrandWhatsapp size={25} />;
@@ -45,6 +53,14 @@ function ContactIcon({ id }: { id: SocialNetwork }) {
   if (id === "tiktok") return <IconBrandTiktok size={25} />;
   if (id === "instagram") return <IconBrandInstagram size={25} />;
   return <IconMail size={25} />;
+}
+
+function paymentButtonClass(status: PaymentStatus) {
+  if (status === "pagado")
+    return "border-emerald-200 bg-emerald-100 text-emerald-700 hover:bg-emerald-200";
+  if (status === "pendiente")
+    return "border-amber-200 bg-amber-100 text-amber-700 hover:bg-amber-200";
+  return "border-alm-teal bg-alm-teal text-white hover:bg-alm-mid";
 }
 
 export default function Navbar({
@@ -72,6 +88,13 @@ export default function Navbar({
     MarketplaceReservation[]
   >([]);
   const [accountMessage, setAccountMessage] = useState("");
+  const [paymentMessage, setPaymentMessage] = useState(
+    DEFAULT_PAYMENT_SETTINGS.message,
+  );
+  const [paymentInfo, setPaymentInfo] = useState<{
+    folio: string;
+    status: PaymentStatus;
+  } | null>(null);
   const [qrLink, setQrLink] = useState<SocialLink | null>(null);
   const { resolvedTheme, setTheme } = useTheme();
   const supabase = useMemo(() => getSupabaseBrowserClient(), []);
@@ -159,7 +182,8 @@ export default function Navbar({
       window.location.href = "/admin";
       return;
     }
-    const [destinationResult, marketplaceResult] = await Promise.all([
+    const [destinationResult, marketplaceResult, paymentConfigResult] =
+      await Promise.all([
       supabase
         .from("reservaciones")
         .select("*")
@@ -170,10 +194,18 @@ export default function Navbar({
         .select("*")
         .eq("usuario_id", user.id)
         .order("creado_en", { ascending: false }),
+      supabase
+        .from("configuracion")
+        .select("valor")
+        .eq("clave", "mensaje_pago")
+        .maybeSingle(),
     ]);
     setReservas((destinationResult.data ?? []) as Reservacion[]);
     setReservasMarketplace(
       (marketplaceResult.data ?? []) as MarketplaceReservation[],
+    );
+    setPaymentMessage(
+      parsePaymentSettings(paymentConfigResult.data?.valor).message,
     );
     setAccountMessage("");
     setAccountOpen(true);
@@ -502,18 +534,20 @@ export default function Navbar({
                 {siteSettings.aboutTitle}
               </h2>
             </div>
-          <div className="mx-auto mt-8 flex h-24 w-24 items-center justify-center rounded-3xl bg-gradient-to-br from-alm-teal to-alm-mid text-white">
+            <div className="mx-auto mt-8 flex min-h-24 items-center justify-center">
               {siteSettings.logoUrl ? (
                 <Image
                   unoptimized
                   src={siteSettings.logoUrl}
                   alt="Icono de Travel Almaré"
-                  width={72}
-                  height={72}
-                  className="h-16 w-16 object-contain"
+                  width={220}
+                  height={120}
+                  className="h-auto max-h-28 w-auto max-w-[220px] object-contain"
                 />
               ) : (
-                <IconPlaneDeparture size={48} />
+                <span className="grid size-24 place-items-center rounded-3xl bg-gradient-to-br from-alm-teal to-alm-mid text-white">
+                  <IconPlaneDeparture size={48} />
+                </span>
               )}
             </div>
             <p className="mt-7 whitespace-pre-line text-lg leading-relaxed text-gray-600 dark:text-alm-beige-mid">
@@ -876,7 +910,10 @@ export default function Navbar({
         <div className="fixed inset-0 z-[60] flex items-center justify-center bg-alm-dark/85 p-4 backdrop-blur-sm">
           <div className="relative max-h-[88vh] w-full max-w-2xl overflow-y-auto rounded-3xl bg-white p-7 shadow-2xl dark:bg-[#133545]">
             <button
-              onClick={() => setAccountOpen(false)}
+              onClick={() => {
+                setAccountOpen(false);
+                setPaymentInfo(null);
+              }}
               aria-label="Cerrar"
               className="absolute right-5 top-5 text-gray-400"
             >
@@ -933,9 +970,31 @@ export default function Navbar({
                             · {r.pasajeros} pasajero(s)
                           </p>
                         </div>
-                        <strong className="text-alm-teal">
-                          ${Number(r.total_pagar).toLocaleString("es-MX")} MXN
-                        </strong>
+                        <div className="flex shrink-0 flex-col gap-2 sm:items-end">
+                          <strong className="text-alm-teal">
+                            ${Number(r.total_pagar).toLocaleString("es-MX")} MXN
+                          </strong>
+                          {(() => {
+                            const paymentStatus = normalizePaymentStatus(
+                              r.estado_pago,
+                            );
+                            return (
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  setPaymentInfo({
+                                    folio: String(r.folio || r.id),
+                                    status: paymentStatus,
+                                  })
+                                }
+                                className={`inline-flex items-center justify-center gap-1.5 rounded-lg border px-3 py-2 text-xs font-black transition ${paymentButtonClass(paymentStatus)}`}
+                              >
+                                <IconCreditCard size={16} />
+                                {PAYMENT_STATUS_LABEL[paymentStatus]}
+                              </button>
+                            );
+                          })()}
+                        </div>
                       </div>
                       <div className="mt-3 flex flex-wrap gap-2">
                         <button
@@ -990,9 +1049,31 @@ export default function Navbar({
                             {dateText} · {r.adultos + r.ninos} persona(s)
                           </p>
                         </div>
-                        <strong className="text-alm-teal">
-                          ${Number(r.total_pagar).toLocaleString("es-MX")} MXN
-                        </strong>
+                        <div className="flex shrink-0 flex-col gap-2 sm:items-end">
+                          <strong className="text-alm-teal">
+                            ${Number(r.total_pagar).toLocaleString("es-MX")} MXN
+                          </strong>
+                          {(() => {
+                            const paymentStatus = normalizePaymentStatus(
+                              r.estado_pago,
+                            );
+                            return (
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  setPaymentInfo({
+                                    folio: r.folio,
+                                    status: paymentStatus,
+                                  })
+                                }
+                                className={`inline-flex items-center justify-center gap-1.5 rounded-lg border px-3 py-2 text-xs font-black transition ${paymentButtonClass(paymentStatus)}`}
+                              >
+                                <IconCreditCard size={16} />
+                                {PAYMENT_STATUS_LABEL[paymentStatus]}
+                              </button>
+                            );
+                          })()}
+                        </div>
                       </div>
                       {canCancel && (
                         <button
@@ -1018,6 +1099,74 @@ export default function Navbar({
               <IconLogout size={18} /> Cerrar sesión
             </button>
           </div>
+        </div>
+      )}
+
+      {paymentInfo && (
+        <div
+          className="fixed inset-0 z-[75] flex items-center justify-center bg-alm-dark/85 p-4 backdrop-blur-sm"
+          onMouseDown={(event) =>
+            event.target === event.currentTarget && setPaymentInfo(null)
+          }
+        >
+          <section
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="payment-info-title"
+            className="relative w-full max-w-lg rounded-3xl border border-alm-beige-mid bg-white p-7 text-center shadow-2xl dark:border-alm-mid dark:bg-[#133545] md:p-9"
+          >
+            <button
+              type="button"
+              onClick={() => setPaymentInfo(null)}
+              aria-label="Cerrar información de pago"
+              className="absolute right-5 top-5 rounded-full border border-alm-beige-mid p-2 text-gray-500 transition hover:bg-alm-beige-light dark:border-alm-mid dark:text-alm-beige-mid dark:hover:bg-alm-dark"
+            >
+              <IconX size={21} />
+            </button>
+            {siteSettings.logoUrl ? (
+              <Image
+                unoptimized
+                src={siteSettings.logoUrl}
+                alt="Logo de Travel Almaré"
+                width={180}
+                height={100}
+                className="mx-auto h-auto max-h-24 w-auto max-w-[200px] object-contain"
+              />
+            ) : (
+              <span className="mx-auto grid size-16 place-items-center rounded-2xl bg-alm-teal/15 text-alm-teal">
+                <IconCreditCard size={34} />
+              </span>
+            )}
+            <p className="mt-5 text-xs font-black uppercase tracking-[.18em] text-alm-teal">
+              Travel Almaré
+            </p>
+            <h2
+              id="payment-info-title"
+              className="mt-1 text-2xl font-black text-alm-dark dark:text-white"
+            >
+              Información de pago
+            </h2>
+            <span
+              className={`mt-4 inline-flex rounded-full border px-3 py-1 text-xs font-black uppercase ${paymentButtonClass(paymentInfo.status)}`}
+            >
+              {PAYMENT_STATUS_LABEL[paymentInfo.status]}
+            </span>
+            <p className="mt-5 whitespace-pre-line text-sm leading-relaxed text-gray-600 dark:text-alm-beige-mid">
+              {paymentInfo.status === "pagado"
+                ? "Tu pago ha sido confirmado correctamente por Travel Almaré."
+                : paymentMessage}
+            </p>
+            <p className="mt-4 text-xs text-gray-400">
+              Folio: {paymentInfo.folio}
+            </p>
+            <button
+              type="button"
+              onClick={() => setPaymentInfo(null)}
+              className="mt-7 w-full rounded-xl bg-alm-teal py-3.5 font-black text-white transition hover:bg-alm-mid"
+            >
+              Cerrar
+            </button>
+          </section>
         </div>
       )}
     </>

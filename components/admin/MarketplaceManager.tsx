@@ -21,7 +21,12 @@ import type {
   MarketplaceReservation,
   MarketplaceReservationStatus,
   MarketplaceType,
+  PaymentStatus,
 } from "@/lib/types";
+import {
+  normalizePaymentStatus,
+  PAYMENT_STATUS_LABEL,
+} from "@/lib/payment-settings";
 
 const fallback =
   "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&q=80&w=1000";
@@ -243,6 +248,28 @@ export default function MarketplaceManager() {
     if (!error) await load();
   }
 
+  async function updatePaymentStatus(
+    reservation: MarketplaceReservation,
+    status: PaymentStatus,
+  ) {
+    const { error } = await supabase
+      .from("reservas_establecimientos")
+      .update({ estado_pago: status })
+      .eq("id", reservation.id);
+    setMessage(
+      error
+        ? {
+            type: "error",
+            text: `No se pudo actualizar el pago: ${error.message}`,
+          }
+        : {
+            type: "ok",
+            text: `Pago marcado como ${PAYMENT_STATUS_LABEL[status].toLocaleLowerCase("es")}.`,
+          },
+    );
+    if (!error) await load();
+  }
+
   async function removeReservation(reservation: MarketplaceReservation) {
     if (
       !window.confirm(
@@ -449,6 +476,7 @@ export default function MarketplaceManager() {
                   <th className="px-4 py-3">Fecha</th>
                   <th className="px-4 py-3">Ocupación</th>
                   <th className="px-4 py-3">Total</th>
+                  <th className="px-4 py-3">Pago</th>
                   <th className="px-4 py-3">Estado</th>
                   <th className="px-4 py-3 text-right">Acciones</th>
                 </tr>
@@ -456,7 +484,7 @@ export default function MarketplaceManager() {
               <tbody className="divide-y">
                 {reservations.length === 0 && (
                   <tr>
-                    <td colSpan={7} className="px-4 py-8 text-center text-gray-400">
+                    <td colSpan={8} className="px-4 py-8 text-center text-gray-400">
                       Aún no hay reservaciones de hoteles, Airbnb o restaurantes.
                     </td>
                   </tr>
@@ -506,6 +534,25 @@ export default function MarketplaceManager() {
                     </td>
                     <td className="px-4 py-3 font-black text-alm-teal">
                       ${Number(reservation.total_pagar).toLocaleString("es-MX")}
+                    </td>
+                    <td className="px-4 py-3">
+                      <select
+                        value={normalizePaymentStatus(
+                          reservation.estado_pago,
+                        )}
+                        onChange={(event) =>
+                          void updatePaymentStatus(
+                            reservation,
+                            event.target.value as PaymentStatus,
+                          )
+                        }
+                        aria-label={`Estado de pago de ${reservation.nombre_cliente}`}
+                        className="rounded-lg border px-2 py-2 text-xs font-bold"
+                      >
+                        <option value="pagar">Pagar</option>
+                        <option value="pendiente">Pendiente</option>
+                        <option value="pagado">Pagado</option>
+                      </select>
                     </td>
                     <td className="px-4 py-3">
                       <select
