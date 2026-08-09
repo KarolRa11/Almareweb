@@ -11,7 +11,9 @@ import {
 } from "@tabler/icons-react";
 import CatalogoCliente from "@/components/CatalogoCliente";
 import ContactCallbackWidget from "@/components/ContactCallbackWidget";
+import CulturalProgramWidget from "@/components/CulturalProgramWidget";
 import MarketplaceExplorer from "@/components/MarketplaceExplorer";
+import MarketplaceMapSection from "@/components/MarketplaceMapSection";
 import Navbar from "@/components/Navbar";
 import { hexToRgba, readStoredSiteSettings, SITE_SETTINGS_STORAGE_KEY, SITE_SETTINGS_UPDATED_EVENT } from "@/lib/site-settings";
 import type { Banner, Destino, MarketplaceListing, SiteSettings, SocialLink } from "@/lib/types";
@@ -99,6 +101,7 @@ export default function HomeContent({ destinos, banners, marketplaceListings, so
             </div>
           </div>
           <CatalogoCliente destinos={resultados} fechaInicial={fecha} viajerosIniciales={Number(viajeros)} />
+          <MarketplaceMapSection listings={marketplaceListings} />
         </div>
       </section>
 
@@ -128,6 +131,7 @@ export default function HomeContent({ destinos, banners, marketplaceListings, so
         <div className="mx-auto mt-5 flex max-w-6xl items-center justify-between text-[11px] text-white/50"><p>© 2026 Travel Almaré</p><span className="flex items-center gap-1.5 text-alm-pastel"><IconLock size={14} /> Sitio seguro</span></div>
       </footer>
       <ContactCallbackWidget settings={siteSettings} />
+      <CulturalProgramWidget />
     </main>
   );
 }
