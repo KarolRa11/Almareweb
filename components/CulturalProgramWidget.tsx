@@ -9,6 +9,7 @@ import {
   IconHeart,
   IconMapPin,
   IconMasksTheater,
+  IconMoodKidFilled,
   IconMusic,
   IconPalette,
   IconSparkles,
@@ -154,32 +155,74 @@ export default function CulturalProgramWidget() {
 
   return (
     <>
-      <button
-        type="button"
-        onClick={() => setOpen(true)}
+      <div
         onMouseEnter={expandAnimation}
         onMouseLeave={collapseAnimation}
         onFocus={expandAnimation}
-        onBlur={collapseAnimation}
-        className={`group fixed right-2 top-1/2 z-[70] h-24 -translate-y-1/2 overflow-hidden rounded-3xl border-4 border-white bg-white shadow-2xl transition-[width,transform,box-shadow] duration-500 hover:shadow-xl focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-alm-pastel dark:border-alm-dark dark:bg-alm-dark sm:right-7 sm:h-32 ${
-          expanded
-            ? "w-[min(22rem,calc(100vw-1rem))] sm:w-96"
-            : "w-24 sm:w-32"
-        }`}
-        aria-haspopup="dialog"
-        aria-controls="programa-guardianes-dialog"
-        aria-label="Abrir Pequeños Guardianes de Acapulco"
+        onBlur={(event) => {
+          if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
+            collapseAnimation();
+          }
+        }}
+        className="fixed right-2 top-1/2 z-[70] -translate-y-1/2 sm:right-7"
       >
-        <DotLottieReact
-          src="https://lottie.host/d4328815-2cbc-4f59-9f74-47cf5ef08dbe/1YOPZxt5Jt.lottie"
-          loop
-          autoplay={false}
-          dotLottieRefCallback={(dotLottie) => {
-            animationRef.current = dotLottie;
-          }}
-          className="h-full w-full"
-        />
-      </button>
+        <button
+          type="button"
+          onClick={() => setOpen(true)}
+          className="group relative grid h-24 w-24 place-items-center overflow-hidden rounded-3xl border-4 border-white bg-white shadow-2xl transition duration-300 hover:-translate-y-1 hover:shadow-xl focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-alm-pastel dark:border-alm-dark dark:bg-alm-dark sm:h-28 sm:w-28"
+          aria-haspopup="dialog"
+          aria-controls="programa-guardianes-dialog"
+          aria-label="Abrir Pequeños Guardianes de Acapulco"
+          aria-expanded={expanded}
+        >
+          <span className="absolute left-2 top-2 rounded-full bg-alm-teal px-2 py-1 text-[9px] font-black text-white shadow-sm">
+            ¡Hola!
+          </span>
+          <span className="mt-3 grid h-16 w-16 place-items-center rounded-2xl bg-gradient-to-br from-alm-pastel/60 to-alm-teal/20 text-alm-mid transition group-hover:scale-105 dark:text-alm-pastel">
+            <IconMoodKidFilled size={50} stroke={1.6} aria-hidden />
+          </span>
+          <span className="absolute bottom-2 right-2 h-3 w-3 rounded-full border-2 border-white bg-alm-teal shadow-sm" />
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setOpen(true)}
+          aria-label="Abrir información de Pequeños Guardianes"
+          aria-hidden={!expanded}
+          tabIndex={expanded ? 0 : -1}
+          className={`absolute right-[calc(100%-0.5rem)] top-1/2 hidden w-80 -translate-y-1/2 overflow-hidden rounded-3xl border-4 border-white bg-white text-left shadow-2xl transition-[opacity,transform,visibility] duration-300 dark:border-alm-dark dark:bg-[#133545] sm:block lg:w-96 ${
+            expanded
+              ? "visible pointer-events-auto translate-x-0 opacity-100"
+              : "invisible pointer-events-none translate-x-3 opacity-0"
+          }`}
+        >
+          <span className="block h-40 overflow-hidden bg-white p-2 lg:h-44">
+            <DotLottieReact
+              src="https://lottie.host/d4328815-2cbc-4f59-9f74-47cf5ef08dbe/1YOPZxt5Jt.lottie"
+              loop
+              autoplay={false}
+              dotLottieRefCallback={(dotLottie) => {
+                animationRef.current = dotLottie;
+                if (dotLottie && expanded) dotLottie.play();
+              }}
+              className="h-full w-full"
+            />
+          </span>
+          <span className="flex items-center justify-between gap-4 bg-gradient-to-r from-alm-teal to-alm-mid px-5 py-4 text-white">
+            <span>
+              <strong className="block text-base font-black leading-tight">
+                Pequeños Guardianes
+              </strong>
+              <span className="mt-1 block text-xs text-white/85">
+                Cultura, diversión y aprendizaje
+              </span>
+            </span>
+            <span className="shrink-0 rounded-full bg-white/15 px-3 py-1.5 text-[10px] font-black uppercase tracking-wide">
+              Ver programa
+            </span>
+          </span>
+        </button>
+      </div>
 
       {open && (
         <div
