@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useMemo, useState } from "react";
+import { FormEvent, useEffect, useMemo, useState } from "react";
 import Lottie from "lottie-react";
 import { IconPhoneCall, IconSend, IconX } from "@tabler/icons-react";
 import mapAnimation from "@/public/animations/travel-map.json";
@@ -15,6 +15,17 @@ export default function ContactCallbackWidget({ settings }: { settings: SiteSett
   const [sent, setSent] = useState(false);
   const [error, setError] = useState("");
   const supabase = useMemo(() => getSupabaseBrowserClient(), []);
+
+  useEffect(() => {
+    const openContactForm = () => {
+      setOpen(true);
+      setSent(false);
+      setError("");
+    };
+    window.addEventListener("almare:abrir-contacto", openContactForm);
+    return () =>
+      window.removeEventListener("almare:abrir-contacto", openContactForm);
+  }, []);
 
   async function submitRequest(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -51,7 +62,7 @@ export default function ContactCallbackWidget({ settings }: { settings: SiteSett
       <span className={`min-w-0 flex-1 px-3 text-left transition-opacity delay-100 duration-300 sm:px-4 ${expanded ? "opacity-100" : "opacity-0"}`}><b className="block text-sm leading-tight sm:text-base">{settings.contactPrompt}</b><span className="mt-1 block text-[11px] leading-tight text-white/85 sm:text-xs">Déjanos tu número y te llamamos</span></span>
     </button>
 
-    {open && <div className="fixed inset-0 z-[80] flex items-center justify-center bg-alm-dark/75 p-4 backdrop-blur-sm" onMouseDown={(event) => event.target === event.currentTarget && setOpen(false)}>
+    {open && <div className="fixed inset-0 z-[2300] flex items-center justify-center bg-alm-dark/75 p-4 backdrop-blur-sm" onMouseDown={(event) => event.target === event.currentTarget && setOpen(false)}>
       <section role="dialog" aria-modal="true" aria-labelledby="callback-title" className="relative w-full max-w-md rounded-3xl bg-white p-7 shadow-2xl dark:bg-[#133545] sm:p-9">
         <button type="button" onClick={() => setOpen(false)} aria-label="Cerrar formulario" className="absolute right-5 top-5 rounded-full p-2 text-gray-400 hover:bg-gray-100 dark:hover:bg-alm-dark"><IconX /></button>
         <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-alm-teal/15 text-alm-teal"><IconPhoneCall size={30} /></span>

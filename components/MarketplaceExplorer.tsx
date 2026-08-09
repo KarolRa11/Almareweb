@@ -418,7 +418,7 @@ export default function MarketplaceExplorer({
                 Selecciona un punto para consultar detalles y reservar.
               </p>
             </div>
-            <div className="border-t border-alm-beige-mid dark:border-alm-mid">
+            <div className="almare-marketplace-map border-t border-alm-beige-mid dark:border-alm-mid">
               <div
                 className="flex flex-wrap gap-2 bg-white px-5 py-3 dark:bg-alm-dark"
                 role="group"

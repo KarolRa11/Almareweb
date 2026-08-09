@@ -1,6 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { DotLottieReact } from "@lottiefiles/dotlottie-react";
+import type { DotLottie } from "@lottiefiles/dotlottie-web";
 import {
   IconBook,
   IconClock,
@@ -108,46 +110,80 @@ const activities = [
 
 export default function CulturalProgramWidget() {
   const [open, setOpen] = useState(false);
+  const [expanded, setExpanded] = useState(false);
+  const [selectedActivity, setSelectedActivity] = useState<string | null>(null);
+  const animationRef = useRef<DotLottie | null>(null);
+
+  function expandAnimation() {
+    setExpanded(true);
+    animationRef.current?.play();
+  }
+
+  function collapseAnimation() {
+    setExpanded(false);
+    animationRef.current?.stop();
+  }
+
+  function openContactForm() {
+    setSelectedActivity(null);
+    setOpen(false);
+    window.setTimeout(
+      () => window.dispatchEvent(new Event("almare:abrir-contacto")),
+      0,
+    );
+  }
 
   useEffect(() => {
     if (!open) return;
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     const closeOnEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setOpen(false);
+      if (event.key !== "Escape") return;
+      if (selectedActivity) {
+        setSelectedActivity(null);
+        return;
+      }
+      setOpen(false);
     };
     window.addEventListener("keydown", closeOnEscape);
     return () => {
       document.body.style.overflow = previousOverflow;
       window.removeEventListener("keydown", closeOnEscape);
     };
-  }, [open]);
+  }, [open, selectedActivity]);
 
   return (
     <>
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="group fixed bottom-4 right-4 z-50 flex max-w-[calc(100vw-8.5rem)] items-center gap-2 rounded-2xl border-4 border-white bg-gradient-to-br from-alm-teal to-alm-mid px-3 py-2.5 text-left text-white shadow-2xl transition hover:-translate-y-1 hover:shadow-xl focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-alm-pastel dark:border-alm-dark sm:bottom-7 sm:right-7 sm:max-w-none sm:gap-3 sm:px-4 sm:py-3"
+        onMouseEnter={expandAnimation}
+        onMouseLeave={collapseAnimation}
+        onFocus={expandAnimation}
+        onBlur={collapseAnimation}
+        className={`group fixed right-2 top-1/2 z-[70] h-24 -translate-y-1/2 overflow-hidden rounded-3xl border-4 border-white bg-white shadow-2xl transition-[width,transform,box-shadow] duration-500 hover:shadow-xl focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-alm-pastel dark:border-alm-dark dark:bg-alm-dark sm:right-7 sm:h-32 ${
+          expanded
+            ? "w-[min(22rem,calc(100vw-1rem))] sm:w-96"
+            : "w-24 sm:w-32"
+        }`}
         aria-haspopup="dialog"
         aria-controls="programa-guardianes-dialog"
+        aria-label="Abrir Pequeños Guardianes de Acapulco"
       >
-        <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-white/15 sm:h-12 sm:w-12">
-          <IconSparkles size={26} aria-hidden />
-        </span>
-        <span className="min-w-0">
-          <span className="block truncate text-xs font-black leading-tight sm:text-sm">
-            Pequeños Guardianes
-          </span>
-          <span className="hidden text-[10px] text-white/80 sm:block">
-            Cultura y diversión infantil
-          </span>
-        </span>
+        <DotLottieReact
+          src="https://lottie.host/d4328815-2cbc-4f59-9f74-47cf5ef08dbe/1YOPZxt5Jt.lottie"
+          loop
+          autoplay={false}
+          dotLottieRefCallback={(dotLottie) => {
+            animationRef.current = dotLottie;
+          }}
+          className="h-full w-full"
+        />
       </button>
 
       {open && (
         <div
-          className="fixed inset-0 z-[90] flex items-end justify-center bg-alm-dark/80 p-0 backdrop-blur-sm sm:items-center sm:p-5"
+          className="fixed inset-0 z-[2100] flex items-end justify-center bg-alm-dark/80 p-0 backdrop-blur-sm sm:items-center sm:p-5"
           onMouseDown={(event) =>
             event.target === event.currentTarget && setOpen(false)
           }
@@ -245,13 +281,22 @@ export default function CulturalProgramWidget() {
                             </p>
                           </div>
                         </div>
-                        <div className="mt-3 flex flex-wrap gap-2 text-[10px] font-bold text-alm-mid dark:text-alm-pastel">
-                          <span className="inline-flex items-center gap-1 rounded-full bg-alm-beige-light px-2.5 py-1 dark:bg-alm-dark">
-                            <IconUsers size={13} /> {activity.ages}
-                          </span>
-                          <span className="inline-flex items-center gap-1 rounded-full bg-alm-beige-light px-2.5 py-1 dark:bg-alm-dark">
-                            <IconClock size={13} /> {activity.duration}
-                          </span>
+                        <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
+                          <div className="flex flex-wrap gap-2 text-[10px] font-bold text-alm-mid dark:text-alm-pastel">
+                            <span className="inline-flex items-center gap-1 rounded-full bg-alm-beige-light px-2.5 py-1 dark:bg-alm-dark">
+                              <IconUsers size={13} /> {activity.ages}
+                            </span>
+                            <span className="inline-flex items-center gap-1 rounded-full bg-alm-beige-light px-2.5 py-1 dark:bg-alm-dark">
+                              <IconClock size={13} /> {activity.duration}
+                            </span>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => setSelectedActivity(activity.title)}
+                            className="rounded-xl bg-alm-teal px-3 py-2 text-[11px] font-black text-white transition hover:bg-alm-mid focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-alm-teal/40"
+                          >
+                            Solicitar lugar
+                          </button>
                         </div>
                       </article>
                     );
@@ -268,6 +313,67 @@ export default function CulturalProgramWidget() {
                   Cerrar información
                 </button>
               </div>
+            </div>
+          </section>
+        </div>
+      )}
+
+      {selectedActivity && (
+        <div
+          className="fixed inset-0 z-[2200] flex items-center justify-center bg-alm-dark/80 p-4 backdrop-blur-sm"
+          onMouseDown={(event) =>
+            event.target === event.currentTarget && setSelectedActivity(null)
+          }
+        >
+          <section
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="apartado-guardianes-title"
+            className="relative w-full max-w-md rounded-3xl bg-white p-7 text-center shadow-2xl dark:bg-[#133545] sm:p-9"
+          >
+            <button
+              type="button"
+              onClick={() => setSelectedActivity(null)}
+              aria-label="Cerrar aviso"
+              className="absolute right-5 top-5 rounded-full p-2 text-gray-400 hover:bg-gray-100 dark:hover:bg-alm-dark"
+            >
+              <IconX />
+            </button>
+            <span className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-alm-teal/15 text-alm-teal">
+              <IconSparkles size={29} />
+            </span>
+            <p className="mt-5 text-[10px] font-black uppercase tracking-[.18em] text-alm-teal">
+              Pequeños Guardianes
+            </p>
+            <h3
+              id="apartado-guardianes-title"
+              className="mt-2 text-2xl font-black text-alm-dark dark:text-white"
+            >
+              Aparta tu lugar
+            </h3>
+            <p className="mt-2 font-bold text-alm-mid dark:text-alm-pastel">
+              {selectedActivity}
+            </p>
+            <p className="mt-4 text-sm leading-relaxed text-gray-600 dark:text-alm-beige-mid">
+              Si quieres apartar tu lugar, comunícate con Travel Almaré. Nuestro
+              equipo te ayudará a confirmar disponibilidad y los detalles de la
+              actividad.
+            </p>
+            <div className="mt-7 grid gap-3 sm:grid-cols-2">
+              <button
+                type="button"
+                onClick={() => setSelectedActivity(null)}
+                className="rounded-xl bg-alm-beige-light px-5 py-3 text-sm font-black text-alm-mid dark:bg-alm-dark dark:text-white"
+              >
+                Cerrar
+              </button>
+              <button
+                type="button"
+                onClick={openContactForm}
+                className="rounded-xl bg-alm-teal px-5 py-3 text-sm font-black text-white transition hover:bg-alm-mid"
+              >
+                Contactar a Almaré
+              </button>
             </div>
           </section>
         </div>
