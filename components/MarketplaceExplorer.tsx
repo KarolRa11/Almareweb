@@ -25,7 +25,7 @@ import {
   IconX,
 } from "@tabler/icons-react";
 import type { AuthChangeEvent, Session, User } from "@supabase/supabase-js";
-import { MARKETPLACE_OPEN_EVENT } from "@/components/MarketplaceMapSection";
+import MarketplaceMap from "@/components/MarketplaceMap";
 import { getSupabaseBrowserClient } from "@/lib/supabase-browser";
 import type {
   MarketplaceListing,
@@ -110,6 +110,9 @@ export default function MarketplaceExplorer({
   const [cardFilter, setCardFilter] = useState<"todos" | MarketplaceType>(
     "todos",
   );
+  const [mapFilter, setMapFilter] = useState<"todos" | MarketplaceType>(
+    "todos",
+  );
   const [selected, setSelected] = useState<MarketplaceListing | null>(null);
   const [booking, setBooking] = useState(false);
   const [imageIndex, setImageIndex] = useState(0);
@@ -151,6 +154,14 @@ export default function MarketplaceExplorer({
       ),
     [cardFilter, listings],
   );
+  const mapListings = useMemo(
+    () =>
+      listings.filter(
+        (listing) => mapFilter === "todos" || listing.tipo === mapFilter,
+      ),
+    [listings, mapFilter],
+  );
+
   const selectListing = useCallback((listing: MarketplaceListing) => {
     setSelected(listing);
     setBooking(false);
@@ -158,19 +169,6 @@ export default function MarketplaceExplorer({
     setError("");
     setSuccess("");
   }, []);
-
-  useEffect(() => {
-    const handleMapSelection = (event: Event) => {
-      const listingId = (event as CustomEvent<{ listingId?: string }>).detail
-        ?.listingId;
-      const listing = listings.find((item) => item.id === listingId);
-      if (listing) selectListing(listing);
-    };
-
-    window.addEventListener(MARKETPLACE_OPEN_EVENT, handleMapSelection);
-    return () =>
-      window.removeEventListener(MARKETPLACE_OPEN_EVENT, handleMapSelection);
-  }, [listings, selectListing]);
 
   const pictures = useMemo(() => {
     if (!selected) return [fallback];
@@ -401,6 +399,59 @@ export default function MarketplaceExplorer({
               })}
             </div>
           )}
+
+          <section
+            aria-labelledby="mapa-marketplace-title"
+            className="mt-12 overflow-hidden rounded-2xl border border-alm-beige-mid bg-white shadow-lg dark:border-alm-mid dark:bg-alm-dark"
+          >
+            <div className="bg-alm-beige p-5 dark:bg-[#133545]">
+              <p className="text-[10px] font-black uppercase tracking-[.2em] text-alm-teal">
+                Ubicación
+              </p>
+              <h3
+                id="mapa-marketplace-title"
+                className="text-lg font-black text-alm-mid dark:text-white"
+              >
+                Mapa de hoteles, Airbnb y restaurantes
+              </h3>
+              <p className="text-xs text-gray-500 dark:text-alm-beige-mid">
+                Selecciona un punto para consultar detalles y reservar.
+              </p>
+            </div>
+            <div className="border-t border-alm-beige-mid dark:border-alm-mid">
+              <div
+                className="flex flex-wrap gap-2 bg-white px-5 py-3 dark:bg-alm-dark"
+                role="group"
+                aria-label="Filtrar puntos del mapa"
+              >
+                {filterButtons.map(([value, label]) => (
+                  <button
+                    key={value}
+                    type="button"
+                    onClick={() => setMapFilter(value)}
+                    aria-pressed={mapFilter === value}
+                    className={`rounded-full px-3 py-2 text-[11px] font-bold transition ${
+                      mapFilter === value
+                        ? "bg-alm-teal text-white"
+                        : "border border-alm-beige-mid bg-white text-alm-mid hover:bg-alm-teal/10 dark:bg-alm-dark dark:text-white"
+                    }`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+              {mapListings.length ? (
+                <MarketplaceMap
+                  listings={mapListings}
+                  onSelect={selectListing}
+                />
+              ) : (
+                <div className="grid h-72 place-items-center px-5 text-center text-sm text-gray-500">
+                  No hay puntos publicados en esta categoría.
+                </div>
+              )}
+            </div>
+          </section>
 
         </div>
       </section>

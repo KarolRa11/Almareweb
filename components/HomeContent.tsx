@@ -13,7 +13,6 @@ import CatalogoCliente from "@/components/CatalogoCliente";
 import ContactCallbackWidget from "@/components/ContactCallbackWidget";
 import CulturalProgramWidget from "@/components/CulturalProgramWidget";
 import MarketplaceExplorer from "@/components/MarketplaceExplorer";
-import MarketplaceMapSection from "@/components/MarketplaceMapSection";
 import Navbar from "@/components/Navbar";
 import { hexToRgba, readStoredSiteSettings, SITE_SETTINGS_STORAGE_KEY, SITE_SETTINGS_UPDATED_EVENT } from "@/lib/site-settings";
 import type { Banner, Destino, MarketplaceListing, SiteSettings, SocialLink } from "@/lib/types";
@@ -101,7 +100,16 @@ export default function HomeContent({ destinos, banners, marketplaceListings, so
             </div>
           </div>
           <CatalogoCliente destinos={resultados} fechaInicial={fecha} viajerosIniciales={Number(viajeros)} />
-          <MarketplaceMapSection listings={marketplaceListings} />
+          <figure className="mt-12 overflow-hidden rounded-2xl border border-alm-beige-mid bg-alm-beige shadow-lg dark:border-alm-mid md:mt-16">
+            <Image
+              src="/mapa-zonas-almare.png"
+              alt="Ilustración de las zonas turísticas de Acapulco y las experiencias de Travel Almaré"
+              width={1408}
+              height={768}
+              sizes="(max-width: 767px) 100vw, 1152px"
+              className="h-auto w-full object-contain"
+            />
+          </figure>
         </div>
       </section>
 
