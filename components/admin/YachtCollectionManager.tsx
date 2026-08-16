@@ -242,12 +242,29 @@ export default function YachtCollectionManager() {
         },
         { onConflict: "clave" },
       );
+    let publicError: { message: string } | null = null;
+    if (!error) {
+      const publicFile = new Blob([JSON.stringify(normalized)], {
+        type: "application/json",
+      });
+      const result = await supabase.storage
+        .from("destinos")
+        .upload("configuracion-publica/yates.json", publicFile, {
+          cacheControl: "60",
+          contentType: "application/json",
+          upsert: true,
+        });
+      publicError = result.error;
+    }
     setMessage(
-      error
-        ? { type: "error", text: `No se pudo publicar: ${error.message}` }
+      error || publicError
+        ? {
+            type: "error",
+            text: `No se pudo publicar: ${error?.message || publicError?.message}`,
+          }
         : { type: "ok", text: "Sección de yates publicada correctamente." },
     );
-    if (!error) {
+    if (!error && !publicError) {
       setCollection(normalized);
       router.refresh();
     }
