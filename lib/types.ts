@@ -62,6 +62,29 @@ export type SocialLink = {
   order: number;
 };
 
+export type TravelerPackage = {
+  id: string;
+  level: string;
+  name: string;
+  price: number;
+  currency: string;
+  priceNote?: string | null;
+  shortDescription: string;
+  description: string;
+  imageUrl?: string | null;
+  features: string[];
+  badge?: string | null;
+  accent?: string | null;
+};
+
+export type TravelerCollection = {
+  eyebrow: string;
+  title: string;
+  description: string;
+  disclaimer?: string | null;
+  packages: TravelerPackage[];
+};
+
 export type SiteSettings = {
   logoUrl: string;
   aboutTitle: string;

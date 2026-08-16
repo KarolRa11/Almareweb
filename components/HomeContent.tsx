@@ -14,10 +14,11 @@ import ContactCallbackWidget from "@/components/ContactCallbackWidget";
 import CulturalProgramWidget from "@/components/CulturalProgramWidget";
 import MarketplaceExplorer from "@/components/MarketplaceExplorer";
 import Navbar from "@/components/Navbar";
+import TravelerCollection from "@/components/TravelerCollection";
 import { hexToRgba, readStoredSiteSettings, SITE_SETTINGS_STORAGE_KEY, SITE_SETTINGS_UPDATED_EVENT } from "@/lib/site-settings";
-import type { Banner, Destino, MarketplaceListing, SiteSettings, SocialLink } from "@/lib/types";
+import type { Banner, Destino, MarketplaceListing, SiteSettings, SocialLink, TravelerCollection as TravelerCollectionData } from "@/lib/types";
 
-export default function HomeContent({ destinos, banners, marketplaceListings, socialLinks, initialSiteSettings }: { destinos: Destino[]; banners: Banner[]; marketplaceListings: MarketplaceListing[]; socialLinks: SocialLink[]; initialSiteSettings: SiteSettings }) {
+export default function HomeContent({ destinos, banners, marketplaceListings, socialLinks, travelerCollection, initialSiteSettings }: { destinos: Destino[]; banners: Banner[]; marketplaceListings: MarketplaceListing[]; socialLinks: SocialLink[]; travelerCollection: TravelerCollectionData; initialSiteSettings: SiteSettings }) {
   const [query, setQuery] = useState("");
   const [fecha, setFecha] = useState("");
   const [viajeros, setViajeros] = useState("1");
@@ -90,6 +91,8 @@ export default function HomeContent({ destinos, banners, marketplaceListings, so
           </form>
         </div>
       </section>
+
+      <TravelerCollection collection={travelerCollection} socialLinks={socialLinks} />
 
       <section id="destinos" className="scroll-mt-20 bg-white px-5 py-14 transition-colors dark:bg-alm-dark md:py-20">
         <div className="mx-auto max-w-6xl">
