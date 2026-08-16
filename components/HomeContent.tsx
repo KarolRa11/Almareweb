@@ -16,9 +16,9 @@ import MarketplaceExplorer from "@/components/MarketplaceExplorer";
 import Navbar from "@/components/Navbar";
 import TravelerCollection from "@/components/TravelerCollection";
 import { hexToRgba, readStoredSiteSettings, SITE_SETTINGS_STORAGE_KEY, SITE_SETTINGS_UPDATED_EVENT } from "@/lib/site-settings";
-import type { Banner, Destino, MarketplaceListing, SiteSettings, SocialLink, TravelerCollection as TravelerCollectionData } from "@/lib/types";
+import type { Banner, Destino, MarketplaceListing, SiteSettings, SocialLink, TravelerCollection as TravelerCollectionData, YachtCollection as YachtCollectionData } from "@/lib/types";
 
-export default function HomeContent({ destinos, banners, marketplaceListings, socialLinks, travelerCollection, initialSiteSettings }: { destinos: Destino[]; banners: Banner[]; marketplaceListings: MarketplaceListing[]; socialLinks: SocialLink[]; travelerCollection: TravelerCollectionData; initialSiteSettings: SiteSettings }) {
+export default function HomeContent({ destinos, banners, marketplaceListings, socialLinks, travelerCollection, yachtCollection, initialSiteSettings }: { destinos: Destino[]; banners: Banner[]; marketplaceListings: MarketplaceListing[]; socialLinks: SocialLink[]; travelerCollection: TravelerCollectionData; yachtCollection: YachtCollectionData; initialSiteSettings: SiteSettings }) {
   const [query, setQuery] = useState("");
   const [fecha, setFecha] = useState("");
   const [viajeros, setViajeros] = useState("1");
@@ -116,7 +116,7 @@ export default function HomeContent({ destinos, banners, marketplaceListings, so
         </div>
       </section>
 
-      <MarketplaceExplorer listings={marketplaceListings} />
+      <MarketplaceExplorer listings={marketplaceListings} yachtCollection={yachtCollection} socialLinks={socialLinks} />
 
       <section id="paquetes" className="scroll-mt-20 bg-alm-beige-light px-5 py-14 dark:bg-[#153f52]">
         <div className="mx-auto grid max-w-6xl gap-6 md:grid-cols-3">

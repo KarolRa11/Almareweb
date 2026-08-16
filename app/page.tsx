@@ -8,6 +8,7 @@ import { parseSocialLinks } from "@/lib/social-links";
 import { parseSiteSettings } from "@/lib/site-settings";
 import PageAnalytics from "@/components/PageAnalytics";
 import { parseTravelerCollection } from "@/lib/traveler-collection";
+import { parseYachtCollection } from "@/lib/yacht-collection";
 
 export const dynamic = "force-dynamic";
 
@@ -40,6 +41,6 @@ export default async function Home() {
     !["42P01", "PGRST205"].includes(marketplaceResult.error.code ?? "")
   )
     console.error("No fue posible cargar establecimientos:", marketplaceResult.error.message);
-  const siteConfigValue = siteConfig?.valor && typeof siteConfig.valor === "object" ? siteConfig.valor as { travelerCollection?: unknown } : null;
-  return <><PageAnalytics /><HomeContent destinos={(data ?? []) as Destino[]} banners={(banners ?? []) as Banner[]} marketplaceListings={(marketplaceResult.data ?? []) as MarketplaceListing[]} socialLinks={parseSocialLinks(contactConfig?.valor)} travelerCollection={parseTravelerCollection(siteConfigValue?.travelerCollection)} initialSiteSettings={parseSiteSettings(siteConfig?.valor)} /></>;
+  const siteConfigValue = siteConfig?.valor && typeof siteConfig.valor === "object" ? siteConfig.valor as { travelerCollection?: unknown; yachtCollection?: unknown } : null;
+  return <><PageAnalytics /><HomeContent destinos={(data ?? []) as Destino[]} banners={(banners ?? []) as Banner[]} marketplaceListings={(marketplaceResult.data ?? []) as MarketplaceListing[]} socialLinks={parseSocialLinks(contactConfig?.valor)} travelerCollection={parseTravelerCollection(siteConfigValue?.travelerCollection)} yachtCollection={parseYachtCollection(siteConfigValue?.yachtCollection)} initialSiteSettings={parseSiteSettings(siteConfig?.valor)} /></>;
 }

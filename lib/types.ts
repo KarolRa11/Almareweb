@@ -94,6 +94,31 @@ export type TravelerCollection = {
   packages: TravelerPackage[];
 };
 
+export type YachtListing = {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  currency: string;
+  priceUnit: string;
+  capacity: number;
+  duration?: string | null;
+  location?: string | null;
+  imageUrl?: string | null;
+  images: string[];
+  amenities: string[];
+  features: string[];
+  badge?: string | null;
+  active: boolean;
+};
+
+export type YachtCollection = {
+  eyebrow: string;
+  title: string;
+  description: string;
+  yachts: YachtListing[];
+};
+
 export type SiteSettings = {
   logoUrl: string;
   aboutTitle: string;

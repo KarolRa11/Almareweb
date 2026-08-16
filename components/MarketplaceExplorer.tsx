@@ -26,10 +26,13 @@ import {
 } from "@tabler/icons-react";
 import type { AuthChangeEvent, Session, User } from "@supabase/supabase-js";
 import MarketplaceMap from "@/components/MarketplaceMap";
+import YachtCollection from "@/components/YachtCollection";
 import { getSupabaseBrowserClient } from "@/lib/supabase-browser";
 import type {
   MarketplaceListing,
   MarketplaceType,
+  SocialLink,
+  YachtCollection as YachtCollectionData,
 } from "@/lib/types";
 
 const fallback =
@@ -104,8 +107,12 @@ function rpcError(message: string) {
 
 export default function MarketplaceExplorer({
   listings,
+  yachtCollection,
+  socialLinks,
 }: {
   listings: MarketplaceListing[];
+  yachtCollection: YachtCollectionData;
+  socialLinks: SocialLink[];
 }) {
   const [cardFilter, setCardFilter] = useState<"todos" | MarketplaceType>(
     "todos",
@@ -279,7 +286,7 @@ export default function MarketplaceExplorer({
                 Vive Acapulco a tu manera
               </h2>
               <p className="mt-2 max-w-2xl text-sm text-gray-600 dark:text-alm-beige-mid">
-                Hoteles, alojamientos y restaurantes seleccionados, con
+                Hoteles, alojamientos, restaurantes y yates seleccionados, con
                 disponibilidad y reservación en un solo lugar.
               </p>
             </div>
@@ -399,6 +406,8 @@ export default function MarketplaceExplorer({
               })}
             </div>
           )}
+
+          <YachtCollection collection={yachtCollection} socialLinks={socialLinks} />
 
           <section
             aria-labelledby="mapa-marketplace-title"

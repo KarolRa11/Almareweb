@@ -8,6 +8,7 @@ import CrmManager from "@/components/admin/CrmManager";
 import MarketplaceManager from "@/components/admin/MarketplaceManager";
 import PaymentSettingsManager from "@/components/admin/PaymentSettingsManager";
 import TravelerCollectionManager from "@/components/admin/TravelerCollectionManager";
+import YachtCollectionManager from "@/components/admin/YachtCollectionManager";
 import type { Banner, Destino, PaymentStatus, Perfil, Reservacion } from "@/lib/types";
 import { normalizePaymentStatus, PAYMENT_STATUS_LABEL } from "@/lib/payment-settings";
 import { destinationPolicy, mergeStoredDestinationRules, storeDestinationRules } from "@/lib/destination-rules";
@@ -521,6 +522,7 @@ export default function AdminDashboard() {
           <a href="#perfiles-viajero" className="w-full flex items-center gap-3 px-4 py-3 text-white/70 hover:bg-white/10 rounded-xl font-bold"><IconSparkles size={20} /> Perfiles de viajero</a>
           <a href="#contacto" className="w-full flex items-center gap-3 px-4 py-3 text-white/70 hover:bg-white/10 rounded-xl font-bold"><IconUsers size={20} /> Contacto</a>
           <a href="#marketplace" className="w-full flex items-center gap-3 px-4 py-3 text-white/70 hover:bg-white/10 rounded-xl font-bold"><IconBuildingSkyscraper size={20} /> Hospedaje y restaurantes</a>
+          <a href="#admin-yates" className="w-full flex items-center gap-3 px-4 py-3 text-white/70 hover:bg-white/10 rounded-xl font-bold"><IconSparkles size={20} /> Yates</a>
           <a href="#inventario" className="w-full flex items-center gap-3 px-4 py-3 text-white/70 hover:bg-white/10 rounded-xl font-bold"><IconPhoto size={20} /> Inventario</a>
           <a href="#reservaciones" className="w-full flex items-center gap-3 px-4 py-3 text-white/70 hover:bg-white/10 rounded-xl font-bold"><IconTicket size={20} /> Reservaciones</a>
         </nav>
@@ -550,7 +552,7 @@ export default function AdminDashboard() {
             </div>
           </div>
         </header>
-        {mobileMenu && <nav className="sticky top-20 z-10 grid grid-cols-2 gap-2 border-b bg-alm-dark p-3 text-sm font-bold text-white md:hidden">{[["Resumen","#resumen"],["CRM","#crm"],["Banners","#banners"],["Apariencia","#apariencia"],["Perfiles de viajero","#perfiles-viajero"],["Contacto","#contacto"],["Hospedaje","#marketplace"],["Inventario","#inventario"],["Reservas","#reservaciones"]].map(([label, href]) => <a key={href} href={href} onClick={() => setMobileMenu(false)} className="rounded-lg bg-white/10 px-3 py-2 text-center">{label}</a>)}</nav>}
+        {mobileMenu && <nav className="sticky top-20 z-10 grid grid-cols-2 gap-2 border-b bg-alm-dark p-3 text-sm font-bold text-white md:hidden">{[["Resumen","#resumen"],["CRM","#crm"],["Banners","#banners"],["Apariencia","#apariencia"],["Perfiles de viajero","#perfiles-viajero"],["Contacto","#contacto"],["Hospedaje","#marketplace"],["Yates","#admin-yates"],["Inventario","#inventario"],["Reservas","#reservaciones"]].map(([label, href]) => <a key={href} href={href} onClick={() => setMobileMenu(false)} className="rounded-lg bg-white/10 px-3 py-2 text-center">{label}</a>)}</nav>}
 
         <main id="resumen" className="scroll-mt-24 p-4 md:p-8">
           {notice && <div role="status" className={`mb-6 flex items-center justify-between rounded-xl border p-4 text-sm font-bold ${notice.type === "ok" ? "border-emerald-200 bg-emerald-50 text-emerald-700" : "border-red-200 bg-red-50 text-red-700"}`}><span>{notice.text}</span><button onClick={() => setNotice(null)} aria-label="Cerrar aviso"><IconX size={18} /></button></div>}
@@ -646,6 +648,7 @@ export default function AdminDashboard() {
           <div className="mb-8"><TravelerCollectionManager /></div>
           <div className="mb-8"><SocialLinksManager /></div>
           <MarketplaceManager />
+          <div className="mb-8"><YachtCollectionManager /></div>
 
           <div id="inventario" className="scroll-mt-24 grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
             <div className="lg:col-span-1 bg-white rounded-2xl border p-6 shadow-sm">
