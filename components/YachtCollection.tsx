@@ -103,11 +103,17 @@ export default function YachtCollection({
             </p>
           </div>
         ) : (
-          <div className="mobile-snap-row sm:grid sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
+          <div
+            className={
+              yachts.length === 1
+                ? "mx-auto max-w-4xl"
+                : "mobile-snap-row sm:grid sm:grid-cols-2 sm:gap-6 lg:grid-cols-3"
+            }
+          >
             {yachts.map((yacht) => (
               <article
                 key={yacht.id}
-                className="mobile-snap-card group flex min-h-[420px] flex-col overflow-hidden rounded-2xl border border-alm-beige-mid shadow-sm transition hover:-translate-y-1 hover:shadow-xl dark:border-alm-mid sm:w-auto sm:min-w-0"
+                className={`${yachts.length === 1 ? "grid min-h-0 sm:min-h-[360px] sm:grid-cols-[1.12fr_.88fr]" : "mobile-snap-card flex min-h-[420px] flex-col sm:w-auto sm:min-w-0"} group overflow-hidden rounded-3xl border border-alm-beige-mid bg-white shadow-[0_14px_40px_rgba(29,79,102,.10)] transition hover:-translate-y-1 hover:shadow-[0_22px_48px_rgba(29,79,102,.16)] dark:border-alm-mid dark:bg-alm-dark`}
               >
                 <button
                   type="button"
@@ -115,20 +121,24 @@ export default function YachtCollection({
                     setSelected(yacht);
                     setImageIndex(0);
                   }}
-                  className="relative h-56 overflow-hidden text-left"
+                  className={`relative overflow-hidden text-left ${yachts.length === 1 ? "h-64 sm:h-full sm:min-h-[360px]" : "h-56"}`}
                   aria-label={`Ver detalles de ${yacht.name}`}
                 >
                   <Image
                     unoptimized
                     fill
-                    sizes="(max-width: 640px) 100vw, 33vw"
+                    sizes={
+                      yachts.length === 1
+                        ? "(max-width: 640px) 100vw, 55vw"
+                        : "(max-width: 640px) 100vw, 33vw"
+                    }
                     src={yacht.imageUrl || fallback}
                     alt={yacht.name}
                     className="object-cover transition duration-700 group-hover:scale-105"
                   />
                   <span className="absolute inset-0 bg-gradient-to-t from-alm-dark/75 via-transparent to-transparent" />
                   {yacht.badge && (
-                    <span className="absolute left-4 top-4 rounded-full bg-white/90 px-3 py-1.5 text-[10px] font-black uppercase text-alm-mid">
+                    <span className="absolute left-4 top-4 max-w-[calc(100%-2rem)] truncate rounded-full border border-white/40 bg-white/90 px-3 py-1.5 text-[10px] font-black uppercase tracking-wide text-alm-mid shadow-sm backdrop-blur-sm">
                       {yacht.badge}
                     </span>
                   )}
@@ -142,8 +152,13 @@ export default function YachtCollection({
                     )}
                   </div>
                 </button>
-                <div className="flex flex-1 flex-col p-5">
-                  <p className="line-clamp-3 text-sm leading-relaxed text-gray-600 dark:text-alm-beige-mid">
+                <div className={`flex min-w-0 flex-1 flex-col ${yachts.length === 1 ? "p-6 sm:p-7" : "p-5"}`}>
+                  {yachts.length === 1 && (
+                    <p className="mb-2 text-[10px] font-black uppercase tracking-[.18em] text-alm-teal">
+                      Experiencia privada en la bahía
+                    </p>
+                  )}
+                  <p className={`${yachts.length === 1 ? "line-clamp-5" : "line-clamp-3"} whitespace-pre-line text-sm leading-relaxed text-gray-600 dark:text-alm-beige-mid`}>
                     {yacht.description}
                   </p>
                   <div className="mt-4 flex flex-wrap gap-2">
@@ -158,16 +173,16 @@ export default function YachtCollection({
                       Hasta {yacht.capacity}
                     </span>
                   </div>
-                  <div className="mt-auto flex items-end justify-between border-t border-alm-beige-mid pt-4 dark:border-alm-mid">
-                    <div>
-                      <p className="text-xl font-black text-alm-mid dark:text-white">
+                  <div className="mt-auto flex flex-col gap-4 border-t border-alm-beige-mid pt-4 dark:border-alm-mid sm:flex-row sm:items-end sm:justify-between">
+                    <div className="min-w-0">
+                      <p className={`${yachts.length === 1 ? "text-3xl" : "text-xl"} font-black text-alm-mid dark:text-white`}>
                         {new Intl.NumberFormat("es-MX", {
                           style: "currency",
                           currency: yacht.currency,
                           maximumFractionDigits: 0,
                         }).format(yacht.price)}
                       </p>
-                      <p className="text-[10px] uppercase text-gray-400">
+                      <p className="mt-1 line-clamp-2 text-[10px] leading-relaxed text-gray-400">
                         {yacht.priceUnit}
                       </p>
                     </div>
@@ -177,7 +192,7 @@ export default function YachtCollection({
                         setSelected(yacht);
                         setImageIndex(0);
                       }}
-                      className="rounded-xl bg-alm-teal px-4 py-2.5 text-xs font-black text-white"
+                      className="w-full shrink-0 rounded-xl bg-alm-teal px-5 py-3 text-xs font-black text-white shadow-lg shadow-alm-teal/20 transition hover:bg-alm-mid sm:w-auto"
                     >
                       Ver detalles
                     </button>

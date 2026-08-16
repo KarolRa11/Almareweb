@@ -214,7 +214,7 @@ export default function YachtCollectionManager() {
         priceUnit: item.priceUnit.trim() || "por paseo",
         duration: item.duration?.trim() || null,
         location: item.location?.trim() || null,
-        badge: item.badge?.trim() || null,
+        badge: item.badge?.trim().slice(0, 48) || null,
         whatsappNumber: item.whatsappNumber.replace(/\D/g, ""),
         whatsappMessage:
           item.whatsappMessage.trim() ||
@@ -458,14 +458,19 @@ export default function YachtCollectionManager() {
                     />
                   </label>
                   <label className="text-[10px] font-black uppercase text-gray-500">
-                    Distintivo
+                    Distintivo corto
                     <input
                       value={yacht.badge ?? ""}
+                      maxLength={48}
                       onChange={(event) =>
                         updateYacht(yacht.id, { badge: event.target.value })
                       }
+                      placeholder="Ej. Premium"
                       className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm font-normal normal-case"
                     />
+                    <span className="mt-1 block font-normal normal-case text-gray-400">
+                      Máximo 48 caracteres. La información extensa va en la descripción.
+                    </span>
                   </label>
                   <label className="flex items-end gap-2 pb-3 text-xs font-bold text-gray-600">
                     <input
