@@ -27,6 +27,8 @@ function cleanYacht(value: unknown): YachtListing | null {
     amenities: strings(item.amenities),
     features: strings(item.features),
     badge: typeof item.badge === "string" ? item.badge : null,
+    whatsappNumber: typeof item.whatsappNumber === "string" ? item.whatsappNumber : "",
+    whatsappMessage: typeof item.whatsappMessage === "string" && item.whatsappMessage ? item.whatsappMessage : "Hola, quiero cotizar el yate {nombre}. ¿Me pueden compartir disponibilidad y condiciones?",
     active: item.active !== false,
   };
 }

@@ -116,7 +116,7 @@ export default function HomeContent({ destinos, banners, marketplaceListings, so
         </div>
       </section>
 
-      <MarketplaceExplorer listings={marketplaceListings} yachtCollection={yachtCollection} socialLinks={socialLinks} />
+      <MarketplaceExplorer listings={marketplaceListings} yachtCollection={yachtCollection} />
 
       <section id="paquetes" className="scroll-mt-20 bg-alm-beige-light px-5 py-14 dark:bg-[#153f52]">
         <div className="mx-auto grid max-w-6xl gap-6 md:grid-cols-3">

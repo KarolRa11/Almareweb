@@ -13,51 +13,32 @@ import {
   IconUsers,
   IconX,
 } from "@tabler/icons-react";
-import type {
-  SocialLink,
-  YachtCollection as YachtCollectionData,
-  YachtListing,
-} from "@/lib/types";
+import type { YachtCollection as YachtCollectionData, YachtListing } from "@/lib/types";
 
 const fallback = "/images/traveler-collection/elite.jpg";
 
-function quoteLink(links: SocialLink[], yacht: YachtListing) {
-  const configured =
-    links.find((link) => link.id === "whatsapp")?.url.trim() ?? "";
-  const baseUrl = /^\+?[\d\s()-]+$/.test(configured)
-    ? `https://wa.me/${configured.replace(/\D/g, "")}`
-    : /^https?:\/\/(wa\.me|api\.whatsapp\.com|www\.whatsapp\.com)/i.test(
-          configured,
-        )
-      ? configured
-      : "https://wa.me/";
+function quoteLink(yacht: YachtListing) {
+  const number = yacht.whatsappNumber.replace(/\D/g, "");
+  const baseUrl = number ? `https://wa.me/${number}` : "https://wa.me/";
   const price = new Intl.NumberFormat("es-MX", {
     style: "currency",
     currency: yacht.currency,
     maximumFractionDigits: 0,
   }).format(yacht.price);
-  const details = [
-    "Hola, quiero cotizar este yate:",
-    `Yate: ${yacht.name}`,
-    `Precio desde: ${price} ${yacht.priceUnit}`,
-    yacht.duration ? `Duración: ${yacht.duration}` : null,
-    `Capacidad: hasta ${yacht.capacity} pasajeros`,
-    yacht.location ? `Ubicación: ${yacht.location}` : null,
-    "¿Me pueden compartir disponibilidad y condiciones?",
-  ]
-    .filter(Boolean)
-    .join("\n");
-  const separator = baseUrl.includes("?") ? "&" : "?";
-  return `${baseUrl}${separator}text=${encodeURIComponent(details)}`;
+  const details = yacht.whatsappMessage
+    .replaceAll("{nombre}", yacht.name)
+    .replaceAll("{precio}", price)
+    .replaceAll("{duracion}", yacht.duration ?? "por confirmar")
+    .replaceAll("{capacidad}", String(yacht.capacity))
+    .replaceAll("{ubicacion}", yacht.location ?? "Acapulco");
+  return `${baseUrl}?text=${encodeURIComponent(details)}`;
 }
 
 export default function YachtCollection({
   collection,
-  socialLinks,
   embedded = false,
 }: {
   collection: YachtCollectionData;
-  socialLinks: SocialLink[];
   embedded?: boolean;
 }) {
   const yachts = collection.yachts.filter((item) => item.active);
@@ -343,7 +324,7 @@ export default function YachtCollection({
                 </p>
               </div>
               <a
-                href={quoteLink(socialLinks, selected)}
+                href={quoteLink(selected)}
                 target="_blank"
                 rel="noreferrer"
                 aria-label={`Cotizar ${selected.name} por WhatsApp`}

@@ -31,7 +31,6 @@ import { getSupabaseBrowserClient } from "@/lib/supabase-browser";
 import type {
   MarketplaceListing,
   MarketplaceType,
-  SocialLink,
   YachtCollection as YachtCollectionData,
 } from "@/lib/types";
 
@@ -108,11 +107,9 @@ function rpcError(message: string) {
 export default function MarketplaceExplorer({
   listings,
   yachtCollection,
-  socialLinks,
 }: {
   listings: MarketplaceListing[];
   yachtCollection: YachtCollectionData;
-  socialLinks: SocialLink[];
 }) {
   const [cardFilter, setCardFilter] = useState<"todos" | MarketplaceType | "yates">(
     "todos",
@@ -320,7 +317,7 @@ export default function MarketplaceExplorer({
             </div>
           </div>
 
-          {cardFilter === "yates" ? <YachtCollection collection={yachtCollection} socialLinks={socialLinks} embedded /> : cardListings.length === 0 ? (
+          {cardFilter === "yates" ? <YachtCollection collection={yachtCollection} embedded /> : cardListings.length === 0 ? (
             <div className="rounded-2xl border border-dashed border-alm-beige-mid bg-white p-10 text-center dark:border-alm-mid dark:bg-alm-dark">
               <IconBuildingSkyscraper
                 className="mx-auto text-alm-teal"

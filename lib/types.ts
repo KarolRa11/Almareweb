@@ -109,6 +109,8 @@ export type YachtListing = {
   amenities: string[];
   features: string[];
   badge?: string | null;
+  whatsappNumber: string;
+  whatsappMessage: string;
   active: boolean;
 };
 
