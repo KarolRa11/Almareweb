@@ -44,7 +44,14 @@ export type Perfil = {
   fecha_nacimiento?: string | null;
   sexo?: "femenino" | "masculino" | "no_binario" | "prefiero_no_decir" | null;
   rol?: "cliente" | "admin";
-  crm_rol?: "cliente" | "administrador" | "gerente" | "vendedor" | "soporte" | "marketing" | "lector";
+  crm_rol?:
+    | "cliente"
+    | "administrador"
+    | "gerente"
+    | "vendedor"
+    | "soporte"
+    | "marketing"
+    | "lector";
   crm_permisos?: Record<string, boolean> | null;
   activo?: boolean;
   creado_en?: string;
@@ -52,7 +59,12 @@ export type Perfil = {
 
 export type Banner = { id: string; imagen_url: string; creado_en?: string };
 
-export type SocialNetwork = "whatsapp" | "facebook" | "tiktok" | "instagram" | "email";
+export type SocialNetwork =
+  | "whatsapp"
+  | "facebook"
+  | "tiktok"
+  | "instagram"
+  | "email";
 
 export type SocialLink = {
   id: SocialNetwork;
@@ -82,6 +94,8 @@ export type TravelerPackage = {
   features: string[];
   badge?: string | null;
   accent?: string | null;
+  whatsappNumber: string;
+  whatsappMessage: string;
 };
 
 export type TravelerCollection = {
