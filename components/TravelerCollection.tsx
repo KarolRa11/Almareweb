@@ -58,7 +58,7 @@ export default function TravelerCollection({
   return (
     <section
       id="coleccion-viajero"
-      className="relative scroll-mt-20 overflow-hidden bg-alm-beige-light px-5 py-14 dark:bg-[#153f52] md:py-20"
+      className="relative scroll-mt-20 overflow-hidden bg-alm-beige-light px-4 py-12 dark:bg-[#153f52] sm:px-5 md:py-20"
     >
       <div className="pointer-events-none absolute -left-24 top-12 h-64 w-64 rounded-full bg-alm-teal/10 blur-3xl" />
       <div className="pointer-events-none absolute -right-20 bottom-0 h-72 w-72 rounded-full bg-alm-mid/10 blur-3xl" />
@@ -75,11 +75,11 @@ export default function TravelerCollection({
             {collection.description}
           </p>
         </div>
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+        <div className="mobile-snap-row sm:grid sm:grid-cols-2 sm:gap-5 lg:grid-cols-3 xl:grid-cols-5">
           {collection.packages.map((item, index) => (
             <article
               key={item.id}
-              className={`group relative flex min-h-[390px] flex-col overflow-hidden rounded-3xl border border-t-[3px] border-white/70 bg-white shadow-[0_12px_35px_rgba(29,79,102,.10)] transition duration-300 hover:-translate-y-2 hover:shadow-[0_22px_45px_rgba(29,79,102,.18)] dark:border-white/10 dark:bg-[#123646] ${index === 2 ? "lg:-translate-y-3 lg:hover:-translate-y-5" : ""}`}
+              className={`mobile-snap-card group relative flex min-h-[390px] flex-col overflow-hidden rounded-3xl border border-t-[3px] border-white/70 bg-white shadow-[0_12px_35px_rgba(29,79,102,.10)] transition duration-300 hover:-translate-y-2 hover:shadow-[0_22px_45px_rgba(29,79,102,.18)] dark:border-white/10 dark:bg-[#123646] sm:w-auto sm:min-w-0 ${index === 2 ? "lg:-translate-y-3 lg:hover:-translate-y-5" : ""}`}
               style={
                 {
                   borderTopColor: item.accent ?? "#4a9b8e",

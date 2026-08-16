@@ -277,7 +277,7 @@ export default function MarketplaceExplorer({
     <>
       <section
         id="estancias"
-        className="scroll-mt-20 bg-alm-beige-light px-5 py-14 dark:bg-[#153f52] md:py-20"
+        className="scroll-mt-20 bg-alm-beige-light px-4 py-12 dark:bg-[#153f52] sm:px-5 md:py-20"
       >
         <div className="mx-auto max-w-6xl">
           <div className="mb-8 flex flex-col justify-between gap-5 md:flex-row md:items-end">
@@ -295,7 +295,7 @@ export default function MarketplaceExplorer({
               </p>
             </div>
             <div
-              className="flex flex-wrap gap-2"
+              className="mobile-filter-row sm:flex sm:flex-wrap sm:gap-2"
               role="group"
               aria-label="Filtrar hospedaje y restaurantes"
             >
@@ -329,7 +329,7 @@ export default function MarketplaceExplorer({
               </p>
             </div>
           ) : (
-            <div className="grid items-stretch gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="mobile-snap-row sm:grid sm:grid-cols-2 sm:items-stretch sm:gap-6 lg:grid-cols-3">
               {cardListings.map((listing) => {
                 const price =
                   Number(listing.precio) *
@@ -337,7 +337,7 @@ export default function MarketplaceExplorer({
                 return (
                   <article
                     key={listing.id}
-                    className="flex h-full min-w-0 flex-col overflow-hidden rounded-2xl border border-alm-beige-mid bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-xl dark:border-alm-mid dark:bg-alm-dark"
+                    className="mobile-snap-card flex h-full flex-col overflow-hidden rounded-2xl border border-alm-beige-mid bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-xl dark:border-alm-mid dark:bg-alm-dark sm:w-auto sm:min-w-0"
                   >
                     <button
                       type="button"
@@ -431,7 +431,7 @@ export default function MarketplaceExplorer({
             </div>
             <div className="almare-marketplace-map border-t border-alm-beige-mid dark:border-alm-mid">
               <div
-                className="flex flex-wrap gap-2 bg-white px-5 py-3 dark:bg-alm-dark"
+                className="mobile-filter-row bg-white px-4 py-3 dark:bg-alm-dark sm:flex sm:flex-wrap sm:gap-2 sm:px-5"
                 role="group"
                 aria-label="Filtrar puntos del mapa"
               >
@@ -469,7 +469,7 @@ export default function MarketplaceExplorer({
 
       {selected && (
         <div
-          className="fixed inset-0 z-[65] flex items-center justify-center bg-alm-dark/85 p-3 backdrop-blur-sm"
+          className="mobile-dialog-backdrop fixed inset-0 z-[65] flex items-center justify-center bg-alm-dark/85 p-3 backdrop-blur-sm"
           onMouseDown={(event) =>
             event.target === event.currentTarget && setSelected(null)
           }
@@ -478,9 +478,9 @@ export default function MarketplaceExplorer({
             role="dialog"
             aria-modal="true"
             aria-labelledby="marketplace-detail-title"
-            className="grid max-h-[94vh] w-full max-w-5xl overflow-y-auto rounded-3xl bg-white shadow-2xl dark:bg-[#133545] lg:grid-cols-[1.05fr_.95fr]"
+            className="mobile-bottom-sheet grid max-h-[94dvh] w-full max-w-5xl overflow-y-auto rounded-3xl bg-white shadow-2xl dark:bg-[#133545] lg:grid-cols-[1.05fr_.95fr]"
           >
-            <div className="relative min-h-72 overflow-hidden rounded-t-3xl bg-alm-dark lg:min-h-[650px] lg:rounded-l-3xl lg:rounded-tr-none">
+            <div className="relative min-h-52 shrink-0 overflow-hidden rounded-t-3xl bg-alm-dark sm:min-h-72 lg:min-h-[650px] lg:rounded-l-3xl lg:rounded-tr-none">
               <Image
                 unoptimized
                 fill
@@ -521,7 +521,7 @@ export default function MarketplaceExplorer({
               )}
             </div>
 
-            <div className="relative p-6 sm:p-8">
+            <div className="relative p-5 sm:p-8">
               <button
                 type="button"
                 onClick={() => setSelected(null)}
@@ -536,7 +536,7 @@ export default function MarketplaceExplorer({
               </span>
               <h2
                 id="marketplace-detail-title"
-                className="mt-3 pr-12 text-3xl font-black"
+                className="mt-3 pr-12 text-2xl font-black sm:text-3xl"
               >
                 {selected.nombre}
               </h2>
@@ -602,7 +602,7 @@ export default function MarketplaceExplorer({
                       </span>
                     )}
                   </div>
-                  <div className="mt-6 flex items-end justify-between gap-4">
+                  <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
                     <div>
                       {Number(selected.descuento) > 0 && (
                         <p className="text-sm font-bold text-red-500 line-through">
@@ -625,7 +625,7 @@ export default function MarketplaceExplorer({
                     <button
                       type="button"
                       onClick={startBooking}
-                      className="rounded-xl bg-alm-teal px-6 py-3 text-sm font-black text-white shadow-lg hover:bg-alm-mid"
+                      className="w-full rounded-xl bg-alm-teal px-6 py-3 text-sm font-black text-white shadow-lg hover:bg-alm-mid sm:w-auto"
                     >
                       {selected.tipo === "restaurante"
                         ? "Reservar mesa"

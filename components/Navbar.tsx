@@ -358,7 +358,7 @@ export default function Navbar({
 
   return (
     <>
-      <nav className="sticky top-0 z-40 border-b border-alm-beige-mid bg-white/95 px-5 py-3 backdrop-blur dark:border-alm-mid dark:bg-[#102f3e]/95">
+      <nav className="sticky top-0 z-40 border-b border-alm-beige-mid bg-white/95 px-4 py-2.5 backdrop-blur dark:border-alm-mid dark:bg-[#102f3e]/95 sm:px-5 sm:py-3">
         <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-4">
           <a
             href="#inicio"
@@ -439,14 +439,14 @@ export default function Navbar({
           </div>
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
-            className="rounded-lg p-2 text-alm-mid lg:hidden dark:text-white"
+            className="grid h-11 w-11 place-items-center rounded-xl border border-alm-beige-mid text-alm-mid lg:hidden dark:border-alm-mid dark:text-white"
             aria-label="Abrir menú"
           >
             {mobileOpen ? <IconX /> : <IconMenu2 />}
           </button>
         </div>
         {mobileOpen && (
-          <div className="mx-auto mt-3 grid w-full max-w-7xl gap-2 border-t border-alm-beige-mid pt-3 lg:hidden dark:border-alm-mid">
+          <div className="mx-auto mt-2 grid max-h-[calc(100dvh-4.5rem)] w-full max-w-7xl gap-1 overflow-y-auto border-t border-alm-beige-mid pb-2 pt-3 lg:hidden dark:border-alm-mid">
             {[
               ["Inicio", "#inicio"],
               ["Destinos", "#destinos"],
@@ -457,7 +457,7 @@ export default function Navbar({
                 key={href}
                 href={href}
                 onClick={() => setMobileOpen(false)}
-                className="rounded-lg px-3 py-2 text-sm font-bold hover:bg-alm-beige-light dark:hover:bg-alm-mid/20"
+                className="rounded-xl px-3 py-3 text-sm font-bold hover:bg-alm-beige-light dark:hover:bg-alm-mid/20"
               >
                 {label}
               </a>
@@ -468,7 +468,7 @@ export default function Navbar({
                 setMobileOpen(false);
                 setAboutOpen(true);
               }}
-              className="rounded-lg px-3 py-2 text-left text-sm font-bold hover:bg-alm-beige-light dark:hover:bg-alm-mid/20"
+              className="rounded-xl px-3 py-3 text-left text-sm font-bold hover:bg-alm-beige-light dark:hover:bg-alm-mid/20"
             >
               {siteSettings.aboutTitle}
             </button>
@@ -478,7 +478,7 @@ export default function Navbar({
                 setMobileOpen(false);
                 setContactOpen(true);
               }}
-              className="rounded-lg px-3 py-2 text-left text-sm font-bold hover:bg-alm-beige-light dark:hover:bg-alm-mid/20"
+              className="rounded-xl px-3 py-3 text-left text-sm font-bold hover:bg-alm-beige-light dark:hover:bg-alm-mid/20"
             >
               Contacto
             </button>
@@ -498,6 +498,13 @@ export default function Navbar({
                 {resolvedTheme === "dark" ? <IconSun /> : <IconMoon />}
               </button>
             </div>
+            <a
+              href="#destinos"
+              onClick={() => setMobileOpen(false)}
+              className="flex min-h-12 items-center justify-center gap-2 rounded-xl bg-alm-teal px-4 py-3 text-sm font-black text-white shadow-lg shadow-alm-teal/20"
+            >
+              <IconCalendarPlus size={19} /> Reservar ahora
+            </a>
           </div>
         )}
       </nav>

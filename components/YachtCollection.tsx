@@ -103,11 +103,11 @@ export default function YachtCollection({
             </p>
           </div>
         ) : (
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mobile-snap-row sm:grid sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
             {yachts.map((yacht) => (
               <article
                 key={yacht.id}
-                className="group flex min-h-[420px] flex-col overflow-hidden rounded-2xl border border-alm-beige-mid shadow-sm transition hover:-translate-y-1 hover:shadow-xl dark:border-alm-mid"
+                className="mobile-snap-card group flex min-h-[420px] flex-col overflow-hidden rounded-2xl border border-alm-beige-mid shadow-sm transition hover:-translate-y-1 hover:shadow-xl dark:border-alm-mid sm:w-auto sm:min-w-0"
               >
                 <button
                   type="button"
@@ -194,12 +194,12 @@ export default function YachtCollection({
           role="dialog"
           aria-modal="true"
           aria-labelledby="yacht-detail-title"
-          className="fixed inset-0 z-[90] grid place-items-center bg-alm-dark/85 p-3 backdrop-blur-md"
+          className="mobile-dialog-backdrop fixed inset-0 z-[90] flex items-center justify-center bg-alm-dark/85 p-3 backdrop-blur-md"
           onMouseDown={(event) => {
             if (event.target === event.currentTarget) setSelected(null);
           }}
         >
-          <article className="relative grid max-h-[94vh] w-full max-w-5xl overflow-y-auto rounded-3xl bg-white shadow-2xl dark:bg-[#133545] lg:grid-cols-2 lg:overflow-hidden">
+          <article className="mobile-bottom-sheet relative grid max-h-[94dvh] w-full max-w-5xl overflow-y-auto rounded-3xl bg-white shadow-2xl dark:bg-[#133545] lg:grid-cols-2 lg:overflow-hidden">
             <button
               type="button"
               onClick={() => setSelected(null)}
@@ -208,7 +208,7 @@ export default function YachtCollection({
             >
               <IconX />
             </button>
-            <div className="relative min-h-72 bg-alm-dark lg:min-h-[650px]">
+            <div className="relative min-h-52 bg-alm-dark sm:min-h-72 lg:min-h-[650px]">
               <Image
                 unoptimized
                 fill
@@ -245,7 +245,7 @@ export default function YachtCollection({
                 </>
               )}
             </div>
-            <div className="overflow-y-auto p-6 lg:max-h-[650px] lg:p-9">
+            <div className="overflow-y-auto p-5 sm:p-6 lg:max-h-[650px] lg:p-9">
               <span className="inline-flex items-center gap-2 rounded-full bg-alm-teal/10 px-3 py-1 text-xs font-black text-alm-teal">
                 <IconSailboat size={17} />
                 Yate

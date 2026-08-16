@@ -57,13 +57,13 @@ export default function ContactCallbackWidget({ settings }: { settings: SiteSett
   }
 
   return <>
-    <button type="button" onMouseEnter={() => setExpanded(true)} onMouseLeave={() => setExpanded(false)} onFocus={() => setExpanded(true)} onBlur={() => setExpanded(false)} onClick={() => { setOpen(true); setSent(false); }} className={`group fixed bottom-4 left-4 z-50 flex h-24 max-w-[calc(100vw-2rem)] items-center overflow-hidden rounded-3xl border-4 border-white bg-gradient-to-br from-alm-teal to-alm-mid text-white shadow-2xl transition-[width,transform] duration-500 dark:border-alm-dark sm:bottom-7 sm:left-7 sm:h-28 ${expanded ? "w-[min(26rem,calc(100vw-2rem))] -translate-y-1" : "w-24 sm:w-28"}`} aria-label={settings.contactPrompt}>
-      <span className="flex h-full w-[5.5rem] shrink-0 items-center justify-center bg-white/95 p-1 sm:w-[6.75rem]"><Lottie animationData={mapAnimation} loop autoplay className="h-20 w-20 sm:h-24 sm:w-24" aria-hidden /></span>
+    <button type="button" onMouseEnter={() => setExpanded(true)} onMouseLeave={() => setExpanded(false)} onFocus={() => setExpanded(true)} onBlur={() => setExpanded(false)} onClick={() => { setOpen(true); setSent(false); }} className={`group fixed bottom-3 left-3 z-50 flex h-16 max-w-[calc(100vw-1.5rem)] items-center overflow-hidden rounded-2xl border-2 border-white bg-gradient-to-br from-alm-teal to-alm-mid text-white shadow-2xl transition-[width,transform] duration-500 dark:border-alm-dark sm:bottom-7 sm:left-7 sm:h-28 sm:rounded-3xl sm:border-4 ${expanded ? "w-[min(26rem,calc(100vw-1.5rem))] -translate-y-1" : "w-16 sm:w-28"}`} aria-label={settings.contactPrompt}>
+      <span className="flex h-full w-[3.75rem] shrink-0 items-center justify-center bg-white/95 p-0.5 sm:w-[6.75rem] sm:p-1"><Lottie animationData={mapAnimation} loop autoplay className="h-14 w-14 sm:h-24 sm:w-24" aria-hidden /></span>
       <span className={`min-w-0 flex-1 px-3 text-left transition-opacity delay-100 duration-300 sm:px-4 ${expanded ? "opacity-100" : "opacity-0"}`}><b className="block text-sm leading-tight sm:text-base">{settings.contactPrompt}</b><span className="mt-1 block text-[11px] leading-tight text-white/85 sm:text-xs">Déjanos tu número y te llamamos</span></span>
     </button>
 
-    {open && <div className="fixed inset-0 z-[2300] flex items-center justify-center bg-alm-dark/75 p-4 backdrop-blur-sm" onMouseDown={(event) => event.target === event.currentTarget && setOpen(false)}>
-      <section role="dialog" aria-modal="true" aria-labelledby="callback-title" className="relative w-full max-w-md rounded-3xl bg-white p-7 shadow-2xl dark:bg-[#133545] sm:p-9">
+    {open && <div className="mobile-dialog-backdrop fixed inset-0 z-[2300] flex items-center justify-center bg-alm-dark/75 p-4 backdrop-blur-sm" onMouseDown={(event) => event.target === event.currentTarget && setOpen(false)}>
+      <section role="dialog" aria-modal="true" aria-labelledby="callback-title" className="mobile-bottom-sheet relative w-full max-w-md rounded-3xl bg-white p-6 shadow-2xl dark:bg-[#133545] sm:p-9">
         <button type="button" onClick={() => setOpen(false)} aria-label="Cerrar formulario" className="absolute right-5 top-5 rounded-full p-2 text-gray-400 hover:bg-gray-100 dark:hover:bg-alm-dark"><IconX /></button>
         <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-alm-teal/15 text-alm-teal"><IconPhoneCall size={30} /></span>
         <h2 id="callback-title" className="mt-5 text-2xl font-black">{settings.contactPrompt}</h2>

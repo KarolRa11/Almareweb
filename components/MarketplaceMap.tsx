@@ -84,7 +84,7 @@ export default function MarketplaceMap({
   return (
     <div
       ref={containerRef}
-      className="h-[380px] w-full bg-alm-beige-light md:h-[500px]"
+      className="h-[330px] w-full bg-alm-beige-light sm:h-[380px] md:h-[500px]"
       aria-label="Mapa interactivo con hoteles, Airbnb y restaurantes"
     />
   );

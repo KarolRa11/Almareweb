@@ -51,7 +51,7 @@ export default function TravelerPackageModal({
 
   return (
     <div
-      className="fixed inset-0 z-[80] grid place-items-center bg-alm-dark/85 p-3 backdrop-blur-md md:p-6"
+      className="mobile-dialog-backdrop fixed inset-0 z-[80] flex items-center justify-center bg-alm-dark/85 p-3 backdrop-blur-md md:p-6"
       role="dialog"
       aria-modal="true"
       aria-labelledby={`traveler-package-${item.id}`}
@@ -59,7 +59,7 @@ export default function TravelerPackageModal({
         if (event.target === event.currentTarget) onClose();
       }}
     >
-      <article className="relative grid max-h-[94vh] w-full max-w-5xl overflow-y-auto rounded-[2rem] bg-white shadow-2xl dark:bg-[#102f3e] md:grid-cols-[.82fr_1.18fr] md:overflow-hidden">
+      <article className="mobile-bottom-sheet relative grid max-h-[94dvh] w-full max-w-5xl overflow-y-auto rounded-[2rem] bg-white shadow-2xl dark:bg-[#102f3e] md:grid-cols-[.82fr_1.18fr] md:overflow-hidden">
         <button
           ref={closeButton}
           type="button"
@@ -69,7 +69,7 @@ export default function TravelerPackageModal({
         >
           <IconX size={20} />
         </button>
-        <div className="relative min-h-64 overflow-hidden bg-gradient-to-br from-alm-teal via-alm-mid to-alm-dark md:min-h-[680px]">
+        <div className="relative min-h-52 overflow-hidden bg-gradient-to-br from-alm-teal via-alm-mid to-alm-dark sm:min-h-64 md:min-h-[680px]">
           {item.imageUrl && (
             <Image
               unoptimized
@@ -92,7 +92,7 @@ export default function TravelerPackageModal({
             </p>
             <h2
               id={`traveler-package-${item.id}`}
-              className="mt-1 text-4xl font-black tracking-tight"
+              className="mt-1 text-3xl font-black tracking-tight sm:text-4xl"
             >
               {item.name}
             </h2>
@@ -103,7 +103,7 @@ export default function TravelerPackageModal({
             )}
           </div>
         </div>
-        <div className="flex flex-col p-6 md:max-h-[680px] md:overflow-y-auto md:p-9">
+        <div className="flex flex-col p-5 sm:p-6 md:max-h-[680px] md:overflow-y-auto md:p-9">
           {item.tagline && (
             <p className="pr-10 text-xl font-black text-alm-dark dark:text-white">
               {item.tagline}

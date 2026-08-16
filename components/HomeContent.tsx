@@ -66,16 +66,16 @@ export default function HomeContent({ destinos, banners, marketplaceListings, so
   return (
     <main className="min-h-screen overflow-x-clip bg-alm-beige-light text-alm-dark transition-colors duration-300 dark:bg-alm-dark dark:text-white">
       <Navbar socialLinks={socialLinks} siteSettings={siteSettings} />
-      <section id="inicio" className="relative scroll-mt-20 overflow-hidden bg-gradient-to-br from-alm-dark via-alm-mid to-alm-teal px-5 py-14 text-center text-white md:py-20">
+      <section id="inicio" className="relative scroll-mt-20 overflow-hidden bg-gradient-to-br from-alm-dark via-alm-mid to-alm-teal px-4 py-10 text-center text-white sm:px-5 sm:py-14 md:py-20">
         {banners.map((banner, index) => <Image key={banner.id} unoptimized fill priority={index === 0} sizes="100vw" src={banner.imagen_url} alt="" aria-hidden className={`object-cover transition-opacity duration-1000 ${index === bannerIndex ? "opacity-35" : "opacity-0"}`} />)}
         <div className="absolute inset-0" style={{ background: `linear-gradient(135deg, ${hexToRgba(siteSettings.gradientStart, siteSettings.gradientOpacity)}, ${hexToRgba(siteSettings.gradientEnd, siteSettings.gradientOpacity)})` }} />
         <div className="relative mx-auto max-w-6xl">
-          <span className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-xs font-semibold backdrop-blur-sm">
+          <span className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-2 text-[11px] font-semibold backdrop-blur-sm sm:px-4 sm:text-xs">
             <IconMapPin size={16} /> Experiencias seleccionadas en Acapulco
           </span>
-          <h1 className="text-3xl font-black tracking-tight md:text-5xl">Descubre Acapulco con Travel Almaré</h1>
+          <h1 className="text-[2rem] font-black leading-[1.08] tracking-tight sm:text-4xl md:text-5xl">Descubre Acapulco con Travel Almaré</h1>
           <p className="mx-auto mb-9 mt-3 max-w-2xl text-sm text-white/80 md:text-base">Destinos locales exclusivos · Paquetes a tu medida · Atención personalizada</p>
-          <form onSubmit={buscar} className="mx-auto grid max-w-4xl gap-3 rounded-2xl bg-white p-4 text-left shadow-2xl dark:bg-[#133545] md:grid-cols-[1.2fr_1fr_.8fr_auto]">
+          <form onSubmit={buscar} className="mx-auto grid max-w-4xl gap-3 rounded-3xl bg-white p-4 text-left shadow-2xl dark:bg-[#133545] md:grid-cols-[1.2fr_1fr_.8fr_auto]">
             <label className="text-[11px] font-bold uppercase tracking-wide text-alm-teal">Destino
               <input value={query} onChange={(e) => setQuery(e.target.value)} type="search" placeholder="¿A dónde quieres ir?" className="mt-1 block w-full rounded-lg border border-alm-beige-mid bg-alm-beige-light px-3 py-2.5 text-[13px] text-alm-dark outline-none focus:ring-2 focus:ring-alm-light dark:border-alm-mid dark:bg-alm-dark dark:text-white" />
             </label>
@@ -94,11 +94,11 @@ export default function HomeContent({ destinos, banners, marketplaceListings, so
 
       <TravelerCollection collection={travelerCollection} socialLinks={socialLinks} />
 
-      <section id="destinos" className="scroll-mt-20 bg-white px-5 py-14 transition-colors dark:bg-alm-dark md:py-20">
+      <section id="destinos" className="scroll-mt-20 bg-white px-4 py-12 transition-colors dark:bg-alm-dark sm:px-5 md:py-20">
         <div className="mx-auto max-w-6xl">
           <div className="mb-8 flex flex-col justify-between gap-5 md:flex-row md:items-end">
             <div><p className="mb-1 text-xs font-bold uppercase tracking-[.2em] text-alm-teal">Explora tu próxima aventura</p><h2 className="flex items-center gap-2 text-2xl font-black"><IconMapPin className="text-alm-teal" /> Destinos populares</h2></div>
-            <div className="flex flex-wrap gap-2" role="group" aria-label="Filtrar destinos">
+            <div className="mobile-filter-row sm:flex sm:flex-wrap sm:gap-2" role="group" aria-label="Filtrar destinos">
               {["Todos", "Tradicional", "Dorado", "Diamante"].map((item) => <button key={item} onClick={() => setFiltro(item)} aria-pressed={filtro === item} className={`rounded-full px-4 py-2 text-xs font-bold transition ${filtro === item ? "bg-alm-teal text-white shadow-md" : "border border-alm-beige-mid text-alm-mid hover:bg-alm-beige-light dark:border-alm-mid dark:text-alm-beige-light dark:hover:bg-[#133545]"}`}>{item}</button>)}
             </div>
           </div>
@@ -119,8 +119,8 @@ export default function HomeContent({ destinos, banners, marketplaceListings, so
       <MarketplaceExplorer listings={marketplaceListings} yachtCollection={yachtCollection} />
 
       <section id="paquetes" className="scroll-mt-20 bg-alm-beige-light px-5 py-14 dark:bg-[#153f52]">
-        <div className="mx-auto grid max-w-6xl gap-6 md:grid-cols-3">
-          {[{title:"Viajes a tu medida", text:"Diseñamos cada experiencia según tus fechas, grupo y presupuesto."},{title:"Atención local", text:"Acompañamiento directo antes, durante y después de tu viaje."},{title:"Reserva protegida", text:"Tu solicitud queda registrada y nuestro equipo confirma cada detalle."}].map((item, index) => <article key={item.title} className="rounded-2xl border border-alm-beige-mid bg-white p-6 shadow-sm dark:border-alm-mid dark:bg-alm-dark"><span className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-alm-teal/15 font-black text-alm-teal">0{index + 1}</span><h3 className="text-lg font-black">{item.title}</h3><p className="mt-2 text-sm leading-relaxed text-gray-600 dark:text-alm-beige-mid">{item.text}</p></article>)}
+        <div className="mobile-snap-row mx-auto max-w-6xl sm:grid sm:grid-cols-2 sm:gap-6 md:grid-cols-3">
+          {[{title:"Viajes a tu medida", text:"Diseñamos cada experiencia según tus fechas, grupo y presupuesto."},{title:"Atención local", text:"Acompañamiento directo antes, durante y después de tu viaje."},{title:"Reserva protegida", text:"Tu solicitud queda registrada y nuestro equipo confirma cada detalle."}].map((item, index) => <article key={item.title} className="mobile-snap-card rounded-2xl border border-alm-beige-mid bg-white p-6 shadow-sm dark:border-alm-mid dark:bg-alm-dark sm:w-auto sm:min-w-0"><span className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-alm-teal/15 font-black text-alm-teal">0{index + 1}</span><h3 className="text-lg font-black">{item.title}</h3><p className="mt-2 text-sm leading-relaxed text-gray-600 dark:text-alm-beige-mid">{item.text}</p></article>)}
         </div>
       </section>
 
@@ -139,7 +139,7 @@ export default function HomeContent({ destinos, banners, marketplaceListings, so
           <div><div className="flex items-center gap-2"><IconPlaneDeparture className="text-alm-pastel" size={31} /><div className="leading-none"><span className="block font-serif text-xs italic text-alm-pastel">Travel</span><span className="text-lg font-bold tracking-wide">ALMARÉ</span></div></div><p className="mt-4 max-w-sm text-sm text-white/60">Experiencias memorables y atención cercana en el corazón de Acapulco.</p></div>
           <div className="grid content-start gap-3 text-sm"><a className="flex items-center gap-2 text-white/70 hover:text-alm-pastel" href="mailto:admin@almare.com"><IconMail size={18} /> admin@almare.com</a><a className="text-white/70 hover:text-alm-pastel" href="#preguntas">Preguntas frecuentes</a><a className="text-white/70 hover:text-alm-pastel" href="/politicas">Privacidad, reservaciones y cancelaciones</a></div>
         </div>
-        <div className="mx-auto mt-5 flex max-w-6xl items-center justify-between text-[11px] text-white/50"><p>© 2026 Travel Almaré</p><span className="flex items-center gap-1.5 text-alm-pastel"><IconLock size={14} /> Sitio seguro</span></div>
+        <div className="mx-auto mt-5 flex max-w-6xl flex-col items-center justify-between gap-3 text-center text-[11px] text-white/50 sm:flex-row sm:text-left"><p>© 2026 Travel Almaré</p><span className="flex items-center gap-1.5 text-alm-pastel"><IconLock size={14} /> Sitio seguro</span></div>
       </footer>
       <ContactCallbackWidget settings={siteSettings} />
       <CulturalProgramWidget />

@@ -164,22 +164,22 @@ export default function CulturalProgramWidget() {
             collapseAnimation();
           }
         }}
-        className="fixed right-2 top-1/2 z-[70] -translate-y-1/2 sm:right-7"
+        className="fixed bottom-3 right-3 z-[70] sm:bottom-auto sm:right-7 sm:top-1/2 sm:-translate-y-1/2"
       >
         <button
           type="button"
           onClick={() => setOpen(true)}
-          className="group relative grid h-24 w-24 place-items-center overflow-hidden rounded-3xl border-4 border-white bg-white shadow-2xl transition duration-300 hover:-translate-y-1 hover:shadow-xl focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-alm-pastel dark:border-alm-dark dark:bg-alm-dark sm:h-28 sm:w-28"
+          className="group relative grid h-16 w-16 place-items-center overflow-hidden rounded-2xl border-2 border-white bg-white shadow-2xl transition duration-300 hover:-translate-y-1 hover:shadow-xl focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-alm-pastel dark:border-alm-dark dark:bg-alm-dark sm:h-28 sm:w-28 sm:rounded-3xl sm:border-4"
           aria-haspopup="dialog"
           aria-controls="programa-guardianes-dialog"
           aria-label="Abrir Pequeños Guardianes de Acapulco"
           aria-expanded={expanded}
         >
-          <span className="absolute left-2 top-2 rounded-full bg-alm-teal px-2 py-1 text-[9px] font-black text-white shadow-sm">
+          <span className="absolute left-1 top-1 rounded-full bg-alm-teal px-1.5 py-0.5 text-[7px] font-black text-white shadow-sm sm:left-2 sm:top-2 sm:px-2 sm:py-1 sm:text-[9px]">
             ¡Hola!
           </span>
-          <span className="mt-3 grid h-16 w-16 place-items-center rounded-2xl bg-gradient-to-br from-alm-pastel/60 to-alm-teal/20 text-alm-mid transition group-hover:scale-105 dark:text-alm-pastel">
-            <IconMoodKidFilled size={50} stroke={1.6} aria-hidden />
+          <span className="mt-2 grid h-11 w-11 place-items-center rounded-xl bg-gradient-to-br from-alm-pastel/60 to-alm-teal/20 text-alm-mid transition group-hover:scale-105 dark:text-alm-pastel sm:mt-3 sm:h-16 sm:w-16 sm:rounded-2xl">
+            <IconMoodKidFilled className="h-9 w-9 sm:h-[50px] sm:w-[50px]" stroke={1.6} aria-hidden />
           </span>
           <span className="absolute bottom-2 right-2 h-3 w-3 rounded-full border-2 border-white bg-alm-teal shadow-sm" />
         </button>
