@@ -76,8 +76,10 @@ export default function SiteSettingsManager() {
     setSaving(true);
     setMessage(null);
     storeSiteSettings(settings);
+    const currentResult = await supabase.from("configuracion").select("valor").eq("clave", "apariencia_sitio").maybeSingle();
+    const currentValue = currentResult.data?.valor && typeof currentResult.data.valor === "object" ? currentResult.data.valor as Record<string, unknown> : {};
     const { error } = await supabase.from("configuracion").upsert(
-      { clave: "apariencia_sitio", valor: settings, actualizado_en: new Date().toISOString() },
+      { clave: "apariencia_sitio", valor: { ...currentValue, ...settings }, actualizado_en: new Date().toISOString() },
       { onConflict: "clave" },
     );
     setMessage({
