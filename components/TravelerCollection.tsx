@@ -41,7 +41,7 @@ export default function TravelerCollection({ collection, socialLinks }: { collec
                 <div className="absolute inset-0 bg-gradient-to-t from-alm-dark/90 via-alm-dark/20 to-transparent" />
                 <span className="absolute left-4 top-4 grid h-9 w-9 place-items-center rounded-xl bg-white/15 text-white backdrop-blur-md"><IconSparkles size={18} /></span>
                 {item.badge && <span className="absolute right-3 top-3 rounded-full bg-white/90 px-2.5 py-1 text-[9px] font-black uppercase tracking-wider text-alm-dark shadow">{item.badge}</span>}
-                <div className="absolute inset-x-0 bottom-0 p-4 text-white"><p className="text-[10px] font-bold uppercase tracking-[.2em] text-alm-pastel">{item.level}</p><h3 className="mt-1 text-2xl font-black">{item.name}</h3></div>
+                <div className="absolute inset-x-0 bottom-0 p-4 text-white"><p className="text-[10px] font-bold uppercase tracking-[.2em] text-alm-pastel">{item.level}{item.duration ? ` · ${item.duration}` : ""}</p><h3 className="mt-1 text-2xl font-black">{item.name}</h3></div>
               </button>
               <div className="flex flex-1 flex-col p-5">
                 <p className="line-clamp-3 text-sm leading-relaxed text-gray-600 dark:text-alm-beige-mid">{item.shortDescription}</p>
@@ -52,7 +52,7 @@ export default function TravelerCollection({ collection, socialLinks }: { collec
         </div>
         {collection.disclaimer && <p className="mx-auto mt-8 max-w-3xl text-center text-xs leading-relaxed text-gray-500 dark:text-alm-beige-mid"><strong className="text-alm-dark dark:text-white">Importante:</strong> {collection.disclaimer}</p>}
       </div>
-      {selected && <TravelerPackageModal item={selected} quoteUrl={quoteLink(socialLinks, selected)} onClose={closeModal} />}
+      {selected && <TravelerPackageModal item={selected} quoteUrl={quoteLink(socialLinks, selected)} commercialConditions={collection.commercialConditions} onClose={closeModal} />}
     </section>
   );
 }

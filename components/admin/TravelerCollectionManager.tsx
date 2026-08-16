@@ -27,6 +27,13 @@ function newPackage(): TravelerPackage {
     price: 0,
     currency: "MXN",
     priceNote: "Precio de referencia",
+    couplePrice: null,
+    duration: "",
+    tagline: "",
+    idealFor: "",
+    lodging: "",
+    yacht: "",
+    meals: "",
     shortDescription: "",
     description: "",
     imageUrl: null,
@@ -127,16 +134,24 @@ export default function TravelerCollectionManager() {
     setMessage(null);
     const normalized: TravelerCollection = {
       ...collection,
+      contentVersion: 2,
       eyebrow: collection.eyebrow.trim(),
       title: collection.title.trim(),
       description: collection.description.trim(),
       disclaimer: collection.disclaimer?.trim() || null,
+      commercialConditions: (collection.commercialConditions ?? []).map((condition) => condition.trim()).filter(Boolean),
       packages: collection.packages.map((item) => ({
         ...item,
         level: item.level.trim(),
         name: item.name.trim(),
         currency: item.currency.trim().toUpperCase() || "MXN",
         priceNote: item.priceNote?.trim() || null,
+        duration: item.duration?.trim() || null,
+        tagline: item.tagline?.trim() || null,
+        idealFor: item.idealFor?.trim() || null,
+        lodging: item.lodging?.trim() || null,
+        yacht: item.yacht?.trim() || null,
+        meals: item.meals?.trim() || null,
         shortDescription: item.shortDescription.trim(),
         description: item.description.trim(),
         badge: item.badge?.trim() || null,
@@ -171,6 +186,7 @@ export default function TravelerCollectionManager() {
           <label className="text-[11px] font-black uppercase text-gray-500">Título de la sección<input value={collection.title} onChange={(event) => updateCollection("title", event.target.value)} className="mt-1 w-full rounded-xl border bg-white px-4 py-3 text-sm font-normal normal-case outline-none focus:border-alm-teal" /></label>
           <label className="text-[11px] font-black uppercase text-gray-500 lg:col-span-2">Descripción<textarea value={collection.description} onChange={(event) => updateCollection("description", event.target.value)} rows={3} className="mt-1 w-full resize-y rounded-xl border bg-white px-4 py-3 text-sm font-normal normal-case outline-none focus:border-alm-teal" /></label>
           <label className="text-[11px] font-black uppercase text-gray-500 lg:col-span-2">Aviso comercial<textarea value={collection.disclaimer ?? ""} onChange={(event) => updateCollection("disclaimer", event.target.value)} rows={2} className="mt-1 w-full resize-y rounded-xl border bg-white px-4 py-3 text-sm font-normal normal-case outline-none focus:border-alm-teal" /></label>
+          <label className="text-[11px] font-black uppercase text-gray-500 lg:col-span-2">Condiciones comerciales <span className="font-normal normal-case text-gray-400">(una por línea)</span><textarea value={(collection.commercialConditions ?? []).join("\n")} onChange={(event) => updateCollection("commercialConditions", event.target.value.split("\n"))} rows={6} className="mt-1 w-full resize-y rounded-xl border bg-white px-4 py-3 text-sm font-normal normal-case outline-none focus:border-alm-teal" /></label>
         </div>
 
         <div className="space-y-5">{collection.packages.map((item, index) => (
@@ -189,12 +205,19 @@ export default function TravelerCollectionManager() {
                 <label className="text-[10px] font-black uppercase text-gray-500">Nivel<input value={item.level} onChange={(event) => updatePackage(item.id, { level: event.target.value })} className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm font-normal normal-case outline-none focus:border-alm-teal" /></label>
                 <label className="text-[10px] font-black uppercase text-gray-500">Nombre<input value={item.name} onChange={(event) => updatePackage(item.id, { name: event.target.value })} className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm font-normal normal-case outline-none focus:border-alm-teal" /></label>
                 <label className="text-[10px] font-black uppercase text-gray-500">Distintivo<input value={item.badge ?? ""} onChange={(event) => updatePackage(item.id, { badge: event.target.value })} className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm font-normal normal-case outline-none focus:border-alm-teal" /></label>
+                <label className="text-[10px] font-black uppercase text-gray-500">Duración<input value={item.duration ?? ""} onChange={(event) => updatePackage(item.id, { duration: event.target.value })} placeholder="4 días / 3 noches" className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm font-normal normal-case outline-none focus:border-alm-teal" /></label>
                 <label className="text-[10px] font-black uppercase text-gray-500">Precio<input type="number" min="0" step="1" value={item.price} onChange={(event) => updatePackage(item.id, { price: Number(event.target.value) })} className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm font-normal normal-case outline-none focus:border-alm-teal" /></label>
+                <label className="text-[10px] font-black uppercase text-gray-500">Precio pareja<input type="number" min="0" step="1" value={item.couplePrice ?? ""} onChange={(event) => updatePackage(item.id, { couplePrice: event.target.value ? Number(event.target.value) : null })} className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm font-normal normal-case outline-none focus:border-alm-teal" /></label>
                 <label className="text-[10px] font-black uppercase text-gray-500">Moneda<input value={item.currency} maxLength={3} onChange={(event) => updatePackage(item.id, { currency: event.target.value })} className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm font-normal uppercase outline-none focus:border-alm-teal" /></label>
                 <label className="text-[10px] font-black uppercase text-gray-500">Color<input type="color" value={item.accent || "#4a9b8e"} onChange={(event) => updatePackage(item.id, { accent: event.target.value })} className="mt-1 h-[42px] w-full cursor-pointer rounded-xl border bg-white p-1" /></label>
                 <label className="text-[10px] font-black uppercase text-gray-500 sm:col-span-2">Leyenda del precio<input value={item.priceNote ?? ""} onChange={(event) => updatePackage(item.id, { priceNote: event.target.value })} className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm font-normal normal-case outline-none focus:border-alm-teal" /></label>
+                <label className="text-[10px] font-black uppercase text-gray-500 sm:col-span-2 lg:col-span-3">Frase comercial<input value={item.tagline ?? ""} onChange={(event) => updatePackage(item.id, { tagline: event.target.value })} className="mt-1 w-full rounded-xl border px-3 py-2.5 text-sm font-normal normal-case outline-none focus:border-alm-teal" /></label>
+                <label className="text-[10px] font-black uppercase text-gray-500">Hospedaje<textarea value={item.lodging ?? ""} onChange={(event) => updatePackage(item.id, { lodging: event.target.value })} rows={2} className="mt-1 w-full resize-y rounded-xl border px-3 py-2.5 text-sm font-normal normal-case outline-none focus:border-alm-teal" /></label>
+                <label className="text-[10px] font-black uppercase text-gray-500">Yate<textarea value={item.yacht ?? ""} onChange={(event) => updatePackage(item.id, { yacht: event.target.value })} rows={2} className="mt-1 w-full resize-y rounded-xl border px-3 py-2.5 text-sm font-normal normal-case outline-none focus:border-alm-teal" /></label>
+                <label className="text-[10px] font-black uppercase text-gray-500">Alimentos<textarea value={item.meals ?? ""} onChange={(event) => updatePackage(item.id, { meals: event.target.value })} rows={2} className="mt-1 w-full resize-y rounded-xl border px-3 py-2.5 text-sm font-normal normal-case outline-none focus:border-alm-teal" /></label>
                 <label className="text-[10px] font-black uppercase text-gray-500 sm:col-span-2 lg:col-span-3">Descripción corta<textarea value={item.shortDescription} onChange={(event) => updatePackage(item.id, { shortDescription: event.target.value })} rows={2} className="mt-1 w-full resize-y rounded-xl border px-3 py-2.5 text-sm font-normal normal-case outline-none focus:border-alm-teal" /></label>
                 <label className="text-[10px] font-black uppercase text-gray-500 sm:col-span-2 lg:col-span-3">Descripción detallada<textarea value={item.description} onChange={(event) => updatePackage(item.id, { description: event.target.value })} rows={3} className="mt-1 w-full resize-y rounded-xl border px-3 py-2.5 text-sm font-normal normal-case outline-none focus:border-alm-teal" /></label>
+                <label className="text-[10px] font-black uppercase text-gray-500 sm:col-span-2 lg:col-span-3">Ideal para<textarea value={item.idealFor ?? ""} onChange={(event) => updatePackage(item.id, { idealFor: event.target.value })} rows={2} className="mt-1 w-full resize-y rounded-xl border px-3 py-2.5 text-sm font-normal normal-case outline-none focus:border-alm-teal" /></label>
                 <label className="text-[10px] font-black uppercase text-gray-500 sm:col-span-2 lg:col-span-3">Beneficios <span className="font-normal normal-case text-gray-400">(uno por línea)</span><textarea value={item.features.join("\n")} onChange={(event) => updatePackage(item.id, { features: event.target.value.split("\n") })} rows={4} className="mt-1 w-full resize-y rounded-xl border px-3 py-2.5 text-sm font-normal normal-case outline-none focus:border-alm-teal" /></label>
               </div>
             </div>

@@ -69,6 +69,13 @@ export type TravelerPackage = {
   price: number;
   currency: string;
   priceNote?: string | null;
+  couplePrice?: number | null;
+  duration?: string | null;
+  tagline?: string | null;
+  idealFor?: string | null;
+  lodging?: string | null;
+  yacht?: string | null;
+  meals?: string | null;
   shortDescription: string;
   description: string;
   imageUrl?: string | null;
@@ -78,10 +85,12 @@ export type TravelerPackage = {
 };
 
 export type TravelerCollection = {
+  contentVersion?: number;
   eyebrow: string;
   title: string;
   description: string;
   disclaimer?: string | null;
+  commercialConditions?: string[];
   packages: TravelerPackage[];
 };
 
