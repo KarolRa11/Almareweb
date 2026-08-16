@@ -114,7 +114,7 @@ export default function MarketplaceExplorer({
   yachtCollection: YachtCollectionData;
   socialLinks: SocialLink[];
 }) {
-  const [cardFilter, setCardFilter] = useState<"todos" | MarketplaceType>(
+  const [cardFilter, setCardFilter] = useState<"todos" | MarketplaceType | "yates">(
     "todos",
   );
   const [mapFilter, setMapFilter] = useState<"todos" | MarketplaceType>(
@@ -157,7 +157,7 @@ export default function MarketplaceExplorer({
   const cardListings = useMemo(
     () =>
       listings.filter(
-        (listing) => cardFilter === "todos" || listing.tipo === cardFilter,
+        (listing) => cardFilter === "todos" || (cardFilter !== "yates" && listing.tipo === cardFilter),
       ),
     [cardFilter, listings],
   );
@@ -262,7 +262,14 @@ export default function MarketplaceExplorer({
     );
   }
 
-  const filterButtons: Array<["todos" | MarketplaceType, string]> = [
+  const cardFilterButtons: Array<["todos" | MarketplaceType | "yates", string]> = [
+    ["todos", "Todos"],
+    ["hotel", "Hoteles"],
+    ["airbnb", "Airbnb"],
+    ["restaurante", "Restaurantes"],
+    ["yates", "Yates"],
+  ];
+  const mapFilterButtons: Array<["todos" | MarketplaceType, string]> = [
     ["todos", "Todos"],
     ["hotel", "Hoteles"],
     ["airbnb", "Airbnb"],
@@ -295,7 +302,7 @@ export default function MarketplaceExplorer({
               role="group"
               aria-label="Filtrar hospedaje y restaurantes"
             >
-              {filterButtons.map(([value, label]) => (
+              {cardFilterButtons.map(([value, label]) => (
                 <button
                   key={value}
                   type="button"
@@ -313,7 +320,7 @@ export default function MarketplaceExplorer({
             </div>
           </div>
 
-          {cardListings.length === 0 ? (
+          {cardFilter === "yates" ? <YachtCollection collection={yachtCollection} socialLinks={socialLinks} embedded /> : cardListings.length === 0 ? (
             <div className="rounded-2xl border border-dashed border-alm-beige-mid bg-white p-10 text-center dark:border-alm-mid dark:bg-alm-dark">
               <IconBuildingSkyscraper
                 className="mx-auto text-alm-teal"
@@ -407,8 +414,6 @@ export default function MarketplaceExplorer({
             </div>
           )}
 
-          <YachtCollection collection={yachtCollection} socialLinks={socialLinks} />
-
           <section
             aria-labelledby="mapa-marketplace-title"
             className="mt-12 overflow-hidden rounded-2xl border border-alm-beige-mid bg-white shadow-lg dark:border-alm-mid dark:bg-alm-dark"
@@ -433,7 +438,7 @@ export default function MarketplaceExplorer({
                 role="group"
                 aria-label="Filtrar puntos del mapa"
               >
-                {filterButtons.map(([value, label]) => (
+                {mapFilterButtons.map(([value, label]) => (
                   <button
                     key={value}
                     type="button"

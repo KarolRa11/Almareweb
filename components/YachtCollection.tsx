@@ -15,7 +15,7 @@ function quoteLink(links: SocialLink[], yacht: YachtListing) {
   return `${selected.url}${separator}text=${encodeURIComponent(`Hola, me interesa cotizar el yate ${yacht.name}.`)}`;
 }
 
-export default function YachtCollection({ collection, socialLinks }: { collection: YachtCollectionData; socialLinks: SocialLink[] }) {
+export default function YachtCollection({ collection, socialLinks, embedded = false }: { collection: YachtCollectionData; socialLinks: SocialLink[]; embedded?: boolean }) {
   const yachts = collection.yachts.filter((item) => item.active);
   const [selected, setSelected] = useState<YachtListing | null>(null);
   const [imageIndex, setImageIndex] = useState(0);
@@ -31,7 +31,7 @@ export default function YachtCollection({ collection, socialLinks }: { collectio
   }, [selected]);
 
   return <>
-    <section id="yates" className="mt-12 scroll-mt-24 rounded-3xl border border-alm-beige-mid bg-white p-5 shadow-lg dark:border-alm-mid dark:bg-alm-dark md:p-8">
+    <section id="yates" className={embedded ? "scroll-mt-24" : "mt-12 scroll-mt-24 rounded-3xl border border-alm-beige-mid bg-white p-5 shadow-lg dark:border-alm-mid dark:bg-alm-dark md:p-8"}>
       <div className="mb-7 flex flex-col gap-3 md:flex-row md:items-end md:justify-between"><div><p className="text-xs font-black uppercase tracking-[.2em] text-alm-teal">{collection.eyebrow}</p><h3 className="mt-1 flex items-center gap-2 text-2xl font-black text-alm-mid dark:text-white"><IconSailboat className="text-alm-teal" /> {collection.title}</h3><p className="mt-2 max-w-2xl text-sm text-gray-600 dark:text-alm-beige-mid">{collection.description}</p></div><span className="w-fit rounded-full bg-alm-teal/10 px-4 py-2 text-xs font-black text-alm-mid dark:text-alm-pastel">{yachts.length} {yachts.length === 1 ? "opción" : "opciones"}</span></div>
       {yachts.length === 0 ? <div className="rounded-2xl border border-dashed border-alm-beige-mid px-6 py-10 text-center dark:border-alm-mid"><IconSailboat className="mx-auto text-alm-teal" size={38} /><h4 className="mt-3 font-black">Próximamente</h4><p className="mt-1 text-sm text-gray-500">El equipo está preparando las opciones de yates disponibles.</p></div> : <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">{yachts.map((yacht) => <article key={yacht.id} className="group flex min-h-[420px] flex-col overflow-hidden rounded-2xl border border-alm-beige-mid shadow-sm transition hover:-translate-y-1 hover:shadow-xl dark:border-alm-mid">
         <button type="button" onClick={() => { setSelected(yacht); setImageIndex(0); }} className="relative h-56 overflow-hidden text-left" aria-label={`Ver detalles de ${yacht.name}`}><Image unoptimized fill sizes="(max-width: 640px) 100vw, 33vw" src={yacht.imageUrl || fallback} alt={yacht.name} className="object-cover transition duration-700 group-hover:scale-105" /><span className="absolute inset-0 bg-gradient-to-t from-alm-dark/75 via-transparent to-transparent" />{yacht.badge && <span className="absolute left-4 top-4 rounded-full bg-white/90 px-3 py-1.5 text-[10px] font-black uppercase text-alm-mid">{yacht.badge}</span>}<div className="absolute inset-x-0 bottom-0 p-5 text-white"><h4 className="text-2xl font-black">{yacht.name}</h4>{yacht.location && <p className="mt-1 flex items-center gap-1 text-xs text-white/80"><IconMapPin size={14} />{yacht.location}</p>}</div></button>
